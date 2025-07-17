@@ -10,25 +10,76 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_17_170844) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_17_190004) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
   create_table "collection_items", force: :cascade do |t|
-    t.integer "collection_id"
-    t.integer "provider_id"
+    t.integer "collection_id", null: false
+    t.integer "provider_id", null: false
     t.datetime "added_at"
     t.text "user_note"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["collection_id"], name: "index_collection_items_on_collection_id"
+    t.index ["provider_id"], name: "index_collection_items_on_provider_id"
   end
 
   create_table "collections", force: :cascade do |t|
-    t.integer "user_id"
+    t.integer "user_id", null: false
     t.string "title"
     t.text "description"
     t.boolean "is_public"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_collections_on_user_id"
   end
+
+  create_table "providers", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "category", null: false
+    t.decimal "rating", precision: 3, scale: 2
+    t.string "address"
+    t.string "phone"
+    t.text "hours"
+    t.decimal "latitude", precision: 10, scale: 6
+    t.decimal "longitude", precision: 10, scale: 6
+    t.string "image_url"
+    t.string "price_range"
+    t.string "google_place_id"
+    t.string "yelp_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["category"], name: "index_providers_on_category"
+    t.index ["google_place_id"], name: "index_providers_on_google_place_id", unique: true
+    t.index ["latitude", "longitude"], name: "index_providers_on_latitude_and_longitude"
+    t.index ["yelp_id"], name: "index_providers_on_yelp_id", unique: true
+  end
+
+  create_table "user_favorites", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "provider_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["provider_id"], name: "index_user_favorites_on_provider_id"
+    t.index ["user_id", "provider_id"], name: "index_user_favorites_on_user_id_and_provider_id", unique: true
+    t.index ["user_id"], name: "index_user_favorites_on_user_id"
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "email", null: false
+    t.string "password_digest", null: false
+    t.boolean "is_verified", default: false
+    t.datetime "verified_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_users_on_email", unique: true
+  end
+
+  add_foreign_key "collection_items", "collections"
+  add_foreign_key "collection_items", "providers"
+  add_foreign_key "collections", "users"
+  add_foreign_key "user_favorites", "providers"
+  add_foreign_key "user_favorites", "users"
 end

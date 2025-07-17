@@ -28,6 +28,8 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: rubynofails@cse3901.lol.com
       PGADMIN_DEFAULT_PASSWORD: 1fc4939b-121d-4886-82b9-eeb1923b9ea2
+      PGADMIN_CONFIG_WTF_CSRF_ENABLED: 'False'
+      PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION: 'False'
     ports:
       - "8080:80"
     volumes:

@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  collection_id: 1
+  provider_id: 1
+  added_at: 2025-07-17 14:49:28
+  user_note: MyText
+
+two:
+  collection_id: 1
+  provider_id: 1
+  added_at: 2025-07-17 14:49:28
+  user_note: MyText
