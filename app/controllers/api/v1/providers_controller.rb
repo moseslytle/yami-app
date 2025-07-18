@@ -7,7 +7,7 @@ module Api
         render json: {
           success: true,
           data: {
-            provider: @provider
+            providers: @providers
           }
         }
       end
@@ -18,12 +18,9 @@ module Api
         render json: {
           success: true,
           data: {
-            providers: @providers
+            provider: @provider
           }
         }
-        rescue ActiveRecord::RecordNotFound
-            render json: { success: false, error: "Provider not found" }, status: :not_found
-        end
       end
 
       # GET /api/v1/providers/search
