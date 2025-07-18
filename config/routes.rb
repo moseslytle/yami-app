@@ -2,7 +2,11 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       resources :collections
-      resources :providers, only: [ :index, :show ]
+      resources :providers, only: [ :index, :show ] do
+        collection do
+          get :search
+        end
+      end
 
       namespace :user do
         resources :collections, only: [ :create, :destroy ] do

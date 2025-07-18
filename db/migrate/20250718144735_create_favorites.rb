@@ -1,4 +1,4 @@
-# Created 7/18/2025 by Joshua, migrate for create user favorites table
+# Created 07/18/2025 by Joshua - Migrate for create user favorites table
 class CreateFavorites < ActiveRecord::Migration[8.0]
   def change
     create_table :favorites do |t|
