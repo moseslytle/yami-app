@@ -56,16 +56,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_17_190004) do
     t.index ["yelp_id"], name: "index_providers_on_yelp_id", unique: true
   end
 
-  create_table "user_favorites", force: :cascade do |t|
-    t.bigint "user_id", null: false
-    t.bigint "provider_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["provider_id"], name: "index_user_favorites_on_provider_id"
-    t.index ["user_id", "provider_id"], name: "index_user_favorites_on_user_id_and_provider_id", unique: true
-    t.index ["user_id"], name: "index_user_favorites_on_user_id"
-  end
-
   create_table "users", force: :cascade do |t|
     t.string "name", null: false
     t.string "email", null: false
@@ -80,6 +70,4 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_17_190004) do
   add_foreign_key "collection_items", "collections"
   add_foreign_key "collection_items", "providers"
   add_foreign_key "collections", "users"
-  add_foreign_key "user_favorites", "providers"
-  add_foreign_key "user_favorites", "users"
 end
