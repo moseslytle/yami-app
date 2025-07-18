@@ -3,6 +3,15 @@ Rails.application.routes.draw do
     namespace :v1 do
       resources :collections
       resources :providers, only: [ :index, :show ]
+
+      namespace :user do
+        resources :collections, only: [ :create, :destroy ] do
+          member do
+            put :publish
+          end
+        end
+        resources :favorites, param: :provider_id, only: [ :create, :destroy ]
+      end
     end
   end
 
