@@ -17,4 +17,3 @@ class User < ApplicationRecord
   #   self.verification_token = SecureRandom.urlsafe_base64
   # end
 end
- 

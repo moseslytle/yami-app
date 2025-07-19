@@ -1,6 +1,8 @@
+# Edited 07/19/2025 By Linus Xiong - Add API flow limiting and guarding
 require_relative "boot"
 
 require "rails/all"
+require_relative "../lib/middleware/auth.rb"
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -14,7 +16,13 @@ module Project6RubyNoFails
     # Please, add to the `ignore` list any other `lib` subdirectories that do
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
     # Common ones are `templates`, `generators`, or `middleware`, for example.
-    config.autoload_lib(ignore: %w[assets tasks])
+    config.autoload_lib(ignore: %w[assets tasks middleware])
+
+
+    # API flow limiting and guarding
+    config.middleware.use Rack::Attack
+    # Auth Middleware
+    config.middleware.use AuthenticationMiddleware
 
     # Configuration for the application, engines, and railties goes here.
     #
