@@ -1,6 +1,9 @@
+
 class User < ApplicationRecord
   has_secure_password
-
+  has_many :collections, dependent: :destroy
+  has_many :favorites, dependent: :destroy
+  has_many :favorited_providers, through: :favorites, source: :provider
   # Verification token later?
   # before_create :generate_verification_token
 

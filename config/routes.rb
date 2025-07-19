@@ -2,6 +2,21 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       resources :collections
+      resources :providers, only: [ :index, :show ] do
+        collection do
+          get :search
+        end
+      end
+
+      namespace :user do
+        resources :collections, only: [ :create, :destroy ] do
+          member do
+            put :publish
+          end
+        end
+        resources :favorites, param: :provider_id, only: [ :create, :destroy ]
+      end
+
       post "auth/register", to: "auth#register"
       post "auth/login", to: "auth#login"
       get "me", to: "users#me"
