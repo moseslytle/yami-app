@@ -35,6 +35,8 @@ gem "thruster", require: false
 
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin Ajax possible
 # gem "rack-cors"
+gem "bcrypt", "~> 3.1.7"
+gem "jwt"
 
 # HTTP client for API requests
 gem "httparty"

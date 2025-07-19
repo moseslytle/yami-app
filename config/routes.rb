@@ -16,6 +16,10 @@ Rails.application.routes.draw do
         end
         resources :favorites, param: :provider_id, only: [ :create, :destroy ]
       end
+
+      post "auth/register", to: "auth#register"
+      post "auth/login", to: "auth#login"
+      get "me", to: "users#me"
     end
   end
 
