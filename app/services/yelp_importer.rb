@@ -12,8 +12,8 @@ class YelpImporter
   CATEGORIES = YAML.load_file(Rails.root.join('config', 'yelp_categories.yml'))["categories"]
 
   # Created 07/18/2025 by Paulina Salazar.
-  # Initializes the import with the specified location: Columbus, OH.
   #
+  # Initializes the import with the specified location: Columbus, OH.
   # @param location [String]    the location to search businesses for (default: 'Columbus, OH')
   def initialize(location = 'Columbus, OH')
     @headers = {
@@ -23,11 +23,19 @@ class YelpImporter
   end
 
   # Created 07/18/2025 by Paulina Salazar.
-  # Imports businesses for all categories defined in CATEGORIES through yml file.
+  # Edited 07/19/2025 by Paulina Salazar - added resume_from category to load when rate limit is reached.
   #
   # Iterates through categories, imports one business per category.
-  def import_all
+  # @param resume_from [String]     category importer resumes importing
+  def import_all(resume_from: nil)
+    # Added to resume where categories were not imported due to rate limit.
+    resume = resume_from.nil?
     CATEGORIES.each do |category|
+        unless resume
+            resume = (category== resume_from)
+            next
+        end
+
         begin
             puts "Importing #{category}..."
             import_category(category)
@@ -38,10 +46,8 @@ class YelpImporter
   end
   
   # Created 07/18/2025 by Paulina Salazar.
-  # Imports a single business for the specified category.
   #
   # Fetches business data and finds or creates the Provider record and updates its attributes.
-  #
   # @param category [String]    the Yelp business category to import
   def import_category(category)
     limit = 50
@@ -106,8 +112,8 @@ class YelpImporter
     private
 
     # Created 07/18/2025 by Paulina Salazar.
-    # Fetches  business details from Yelp API by business ID.
     #
+    # Fetches  business details from Yelp API by business ID.
     # @param yelp_id [String]     the Yelp business ID
     # @return [Hash, nil]     parsed JSON response with business details, or nil on failure
     def fetch_business_details(yelp_id)
@@ -123,8 +129,8 @@ class YelpImporter
     end
 
     # Created 07/18/2025 by Paulina Salazar.
-    # Converts Yelp hours data to a readable string.
     #
+    # Converts Yelp hours data to a readable string.
     # @param hours_array [Array<Hash>]    the hours section from Yelp details
     # @return [String, nil]      readable hours or nil
     def format_hours(hours_array)
