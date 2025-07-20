@@ -4,7 +4,7 @@ class User < ApplicationRecord
   has_many :collections, dependent: :destroy
   has_many :favorites, dependent: :destroy
   has_many :favorited_providers, through: :favorites, source: :provider
-  
+
   before_create :generate_verification_token
 
   validates :name, presence: true
