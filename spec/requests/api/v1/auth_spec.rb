@@ -1,15 +1,13 @@
 require 'swagger_helper'
 
 RSpec.describe 'api/v1/auth', type: :request do
-
-  
   # Auth endpoints
   path '/api/v1/auth/register' do
     post('register user') do
       tags 'Authentication'
       consumes 'application/json'
       produces 'application/json'
-      
+
       parameter name: :user_data, in: :body, schema: {
         type: :object,
         properties: {
@@ -20,21 +18,21 @@ RSpec.describe 'api/v1/auth', type: :request do
               email: { type: :string, description: 'User email' },
               password: { type: :string, description: 'User password' }
             },
-            required: ['name', 'email', 'password']
+            required: [ 'name', 'email', 'password' ]
           }
         },
-        required: ['user']
+        required: [ 'user' ]
       }
 
       response(201, 'user registered') do
-        let(:user_data) { 
-          { 
-            user: { 
-              name: 'aa', 
-              email: 'a@p-p.men', 
-              password: 'a@p-p.men' 
-            } 
-          } 
+        let(:user_data) {
+          {
+            user: {
+              name: 'aa',
+              email: 'a@p-p.men',
+              password: 'a@p-p.men'
+            }
+          }
         }
         run_test!
       end
@@ -51,14 +49,14 @@ RSpec.describe 'api/v1/auth', type: :request do
       tags 'Authentication'
       consumes 'application/json'
       produces 'application/json'
-      
+
       parameter name: :credentials, in: :body, schema: {
         type: :object,
         properties: {
           email: { type: :string, description: 'User email' },
           password: { type: :string, description: 'User password' }
         },
-        required: ['email', 'password']
+        required: [ 'email', 'password' ]
       }
 
       response(200, 'login successful') do
