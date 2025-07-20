@@ -4,8 +4,8 @@ class User < ApplicationRecord
   has_many :collections, dependent: :destroy
   has_many :favorites, dependent: :destroy
   has_many :favorited_providers, through: :favorites, source: :provider
-  # Verification token later?
-  # before_create :generate_verification_token
+  
+  before_create :generate_verification_token
 
   validates :name, presence: true
   validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
@@ -13,7 +13,7 @@ class User < ApplicationRecord
 
   private
 
-  # def generate_verification_token
-  #   self.verification_token = SecureRandom.urlsafe_base64
-  # end
+  def generate_verification_token
+    self.verification_token = SecureRandom.urlsafe_base64
+  end
 end
