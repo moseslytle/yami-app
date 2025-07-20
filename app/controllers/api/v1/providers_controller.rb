@@ -52,9 +52,6 @@ module Api
         # Params
         q = params[:q]
         category = params[:category]
-        latitude = params[:latitude]&.to_f
-        longitude = params[:longitude]&.to_f
-        radius = [ (params[:radius] || 10).to_i, 50 ].min
         min_rating = (params[:min_rating] || 1).to_f
         price_range = params[:price_range]
         page = (params[:page] || 1).to_i
@@ -69,18 +66,11 @@ module Api
         end
         providers = providers.where(category: category) if category.present?
         providers = providers.where("rating >= ?", min_rating) if min_rating > 1
-        providers = providers.where(price_range: price_range) if price_range.present?
-
-        # Location based filtering using Geocoder.
-        if latitude && longitude
-          providers = Provider.near([ latitude, longitude ], radius)
-        end
+        providers = providers.where(price_range: price_range) if price_range.present
 
 
         # Search sorting orders.
         providers = case sort
-        when "distance"
-                      providers.order("distance ASC")
         when "rating"
                       providers.order(rating: :desc)
         when "name"
@@ -97,16 +87,12 @@ module Api
           success: true,
           data: {
             providers: providers.as_json(
-              only: [ :id, :name, :category, :rating, :address, :price_range, :image_url ],
-              methods: [ :distance ]
+              only: [ :id, :name, :category, :rating, :address, :price_range, :image_url ]
             ),
             search_metadata: {
               query: q,
               filters_applied: {
                 category: category,
-                latitude: latitude,
-                longitude: longitude,
-                radius: radius,
                 min_rating: min_rating,
                 price_range: price_range
               },
