@@ -22,3 +22,22 @@ DATABASE_USERNAME=rails_user
 DATABASE_PASSWORD=our_password
 DATABASE_PORT=5432
 ```
+
+# Setup SWAG doc
+
+1. update your rspec file, eg spec/requests/api/v1/collections_spec.rb
+2. run `rake rswag:specs:swaggerize` update SWAG
+
+if want to generate new controller doc
+`rails generate rspec:swagger Api::V1::User::CollectionsController`
+
+detail ref [rswag](https://github.com/rswag/rswag)
+
+### How to use JWT
+1. run login to get JWT
+2. click green button on the webpage Authorize
+
+# Rspec
+
+how to run test
+`bundle exec rspec spec/requests/api/v1/user/collections_spec.rb`

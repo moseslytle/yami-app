@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_18_144735) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_20_001552) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -21,17 +21,21 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_18_144735) do
     t.text "user_note"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["added_at"], name: "index_collection_items_on_added_at"
+    t.index ["collection_id", "provider_id"], name: "index_collection_items_on_collection_id_and_provider_id"
     t.index ["collection_id"], name: "index_collection_items_on_collection_id"
     t.index ["provider_id"], name: "index_collection_items_on_provider_id"
   end
 
   create_table "collections", force: :cascade do |t|
     t.integer "user_id", null: false
-    t.string "title"
+    t.string "title", null: false
     t.text "description"
-    t.boolean "is_public"
+    t.boolean "is_public", default: false, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["is_public"], name: "index_collections_on_is_public"
+    t.index ["user_id", "is_public"], name: "index_collections_on_user_id_and_is_public"
     t.index ["user_id"], name: "index_collections_on_user_id"
   end
 
@@ -60,7 +64,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_18_144735) do
     t.string "yelp_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "review_count"
+    t.integer "favorites_count", default: 0, null: false
     t.index ["category"], name: "index_providers_on_category"
+    t.index ["favorites_count"], name: "index_providers_on_favorites_count"
     t.index ["google_place_id"], name: "index_providers_on_google_place_id", unique: true
     t.index ["latitude", "longitude"], name: "index_providers_on_latitude_and_longitude"
     t.index ["yelp_id"], name: "index_providers_on_yelp_id", unique: true

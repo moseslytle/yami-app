@@ -1,5 +1,5 @@
-# Created at 07/18/2025 By Joshua - User favorites controller for CRUD
-# TODO: Have to implement the actual authentication
+# Created at 07/18/2025 By Joshua - User favorites controller for create and destroy actions
+# Updated at 07/19/2025 By Joshua - Update for real authentication with Current.user
 
 # A class handle user favorite operations
 class Api::V1::User::FavoritesController < ApplicationController
@@ -16,7 +16,7 @@ class Api::V1::User::FavoritesController < ApplicationController
       return
     end
 
-    favorite = current_user.favorites.build(provider: provider)
+    favorite = Current.user.favorites.build(provider: provider)
 
     if favorite.save
       render json: favorite, status: :created
@@ -25,25 +25,19 @@ class Api::V1::User::FavoritesController < ApplicationController
     end
   end
 
+
+
   # Removes a favorite for the current user
   #
   # @param provider_id [Integer]  The ID of the provider to unfavorite
   # @return [Hash]  Error message with :not_found status if favorite not exist
   # @return [void]  No content with :no_content status if deletion is successful
   def destroy
-    favorite = current_user.favorites.find_by(provider_id: params[:provider_id])
+    favorite = Current.user.favorites.find_by(provider_id: params[:provider_id])
     if favorite.nil?
       render json: { error: "Favorite not found" }, status: :not_found
     elsif favorite.destroy
       head :no_content
     end
-  end
-
-  private
-
-  # Placeholder method for current user authentication
-  # TODO: Implement actual authentication
-  def current_user
-    @current_user ||= User.first
   end
 end

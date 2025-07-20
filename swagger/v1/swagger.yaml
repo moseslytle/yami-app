@@ -1,0 +1,372 @@
+---
+openapi: 3.0.1
+info:
+  title: Ruby No Fails - Project 6 API DOC
+  version: v1
+paths:
+  "/api/v1/auth/register":
+    post:
+      summary: register user
+      tags:
+      - Authentication
+      parameters: []
+      responses:
+        '201':
+          description: user registered
+        '422':
+          description: unprocessable entity
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      description: User name
+                    email:
+                      type: string
+                      description: User email
+                    password:
+                      type: string
+                      description: User password
+                  required:
+                  - name
+                  - email
+                  - password
+              required:
+              - user
+  "/api/v1/auth/login":
+    post:
+      summary: login user
+      tags:
+      - Authentication
+      parameters: []
+      responses:
+        '200':
+          description: login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: JWT token
+                  user:
+                    type: object
+        '401':
+          description: unauthorized
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: User email
+                password:
+                  type: string
+                  description: User password
+              required:
+              - email
+              - password
+  "/api/v1/collections":
+    get:
+      summary: list public collections
+      tags:
+      - Public Collections
+      responses:
+        '200':
+          description: collections found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    title:
+                      type: string
+                    description:
+                      type: string
+                    is_public:
+                      type: boolean
+                    user_id:
+                      type: integer
+                    created_at:
+                      type: string
+                      format: datetime
+                    updated_at:
+                      type: string
+                      format: datetime
+  "/api/v1/collections/{id}":
+    parameters:
+    - name: id
+      in: path
+      description: Collection ID
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: show public collection
+      tags:
+      - Public Collections
+      responses:
+        '200':
+          description: collection found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  title:
+                    type: string
+                  description:
+                    type: string
+                  is_public:
+                    type: boolean
+                  user_id:
+                    type: integer
+                  created_at:
+                    type: string
+                    format: datetime
+                  updated_at:
+                    type: string
+                    format: datetime
+        '404':
+          description: collection not found
+  "/api/v1/providers/search":
+    get:
+      summary: search provider
+      responses:
+        '200':
+          description: successful
+  "/api/v1/providers":
+    get:
+      summary: list providers
+      responses:
+        '200':
+          description: successful
+  "/api/v1/providers/{id}":
+    parameters:
+    - name: id
+      in: path
+      description: id
+      required: true
+      schema:
+        type: string
+    get:
+      summary: show provider
+      responses:
+        '200':
+          description: successful
+  "/api/v1/user/collections":
+    post:
+      summary: create collection
+      tags:
+      - User Collections
+      security:
+      - Bearer: []
+      parameters: []
+      responses:
+        '201':
+          description: collection created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  user_id:
+                    type: integer
+                  title:
+                    type: string
+                  description:
+                    type: string
+                  is_public:
+                    type: boolean
+                  created_at:
+                    type: string
+                    format: datetime
+                  updated_at:
+                    type: string
+                    format: datetime
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: Collection title
+                  example: test
+                description:
+                  type: string
+                  description: Collection description
+                  example: test
+                is_public:
+                  type: boolean
+                  description: Whether the collection is public
+              required:
+              - title
+  "/api/v1/user/collections/{id}":
+    parameters:
+    - name: id
+      in: path
+      description: Collection ID
+      required: true
+      schema:
+        type: integer
+    patch:
+      summary: update collection
+      tags:
+      - User Collections
+      security:
+      - Bearer: []
+      parameters: []
+      responses:
+        '200':
+          description: collection updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  user_id:
+                    type: integer
+                  title:
+                    type: string
+                  description:
+                    type: string
+                  is_public:
+                    type: boolean
+                  created_at:
+                    type: string
+                    format: datetime
+                  updated_at:
+                    type: string
+                    format: datetime
+        '404':
+          description: collection not found
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: Collection title
+                  example: test-change
+                description:
+                  type: string
+                  description: Collection description
+                is_public:
+                  type: boolean
+                  description: Whether the collection is public
+    delete:
+      summary: delete collection
+      tags:
+      - User Collections
+      security:
+      - Bearer: []
+      responses:
+        '204':
+          description: collection deleted
+        '404':
+          description: collection not found
+  "/api/v1/user/collections/{id}/publish":
+    parameters:
+    - name: id
+      in: path
+      description: Collection ID
+      required: true
+      schema:
+        type: integer
+    put:
+      summary: publish collection
+      tags:
+      - User Collections
+      security:
+      - Bearer: []
+      responses:
+        '200':
+          description: collection published
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  user_id:
+                    type: integer
+                  title:
+                    type: string
+                  description:
+                    type: string
+                  is_public:
+                    type: boolean
+                  published:
+                    type: boolean
+                  created_at:
+                    type: string
+                    format: datetime
+                  updated_at:
+                    type: string
+                    format: datetime
+        '404':
+          description: collection not found
+  "/api/v1/user/favorites":
+    post:
+      summary: create favorite
+      responses:
+        '200':
+          description: successful
+  "/api/v1/user/favorites/{provider_id}":
+    parameters:
+    - name: provider_id
+      in: path
+      description: provider_id
+      required: true
+      schema:
+        type: string
+    delete:
+      summary: delete favorite
+      responses:
+        '200':
+          description: successful
+  "/api/v1/me":
+    get:
+      summary: me user
+      responses:
+        '200':
+          description: successful
+servers:
+- url: http://{defaultHost}
+  variables:
+    defaultHost:
+      default: 127.0.0.1:3000
+components:
+  securitySchemes:
+    Bearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: 'JWT Authorization header using the Bearer scheme. Example: "Authorization:
+        Bearer {token}"'
+security:
+- Bearer: []
