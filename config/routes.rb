@@ -6,7 +6,6 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
-      get "auth/verify/:token", to: "auth#verify"
       resources :collections, only: [ :index, :show ]
       resources :providers, only: [ :index, :show ] do
         collection do
@@ -24,10 +23,14 @@ Rails.application.routes.draw do
         resources :favorites, param: :provider_id, only: [ :create, :destroy ]
       end
 
-      post "auth/register", to: "auth#register"
-      post "auth/login", to: "auth#login"
-      post "auth/password/forgot", to: "auth#forgot_password"
-      post "auth/password/reset", to: "auth#reset_password"
+      namespace :auth do
+        post :register, to: "registrations#create"
+        post :login, to: "sessions#create"
+        post "password/forgot", to: "passwords#forgot"
+        post "password/reset", to: "passwords#reset"
+        get  "verify/:token", to: "verifications#verify"
+      end
+
       get "me", to: "users#me"
     end
   end

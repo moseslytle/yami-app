@@ -10,8 +10,17 @@ module AuthorizeRequest
     header = header.split(" ").last if header.present?
 
     decoded = JsonWebToken.decode(header)
-    @current_user = User.find(decoded[:user_id]) if decoded
-  rescue ActiveRecord::RecordNotFound, JWT::DecodeError
+    
+    if decoded && decoded[:user_id]
+      @current_user = User.find(decoded[:user_id])
+    else
+      render json: { errors: [ "Unauthorized" ] }, status: :unauthorized
+    end
+  rescue ActiveRecord::RecordNotFound
+    render json: { errors: [ "Unauthorized" ] }, status: :unauthorized
+  rescue JWT::DecodeError
+    render json: { errors: [ "Unauthorized" ] }, status: :unauthorized
+  rescue
     render json: { errors: [ "Unauthorized" ] }, status: :unauthorized
   end
 end
