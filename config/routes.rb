@@ -27,6 +27,8 @@ Rails.application.routes.draw do
 
       post "auth/register", to: "auth#register"
       post "auth/login", to: "auth#login"
+      post "auth/password/forgot", to: "auth#forgot_password"
+      post "auth/password/reset", to: "auth#reset_password"
       get "me", to: "users#me"
     end
   end
