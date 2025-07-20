@@ -1,8 +1,12 @@
 Rails.application.routes.draw do
   mount Rswag::Ui::Engine => "/api-docs"
   mount Rswag::Api::Engine => "/api-docs"
+
+
+
   namespace :api do
     namespace :v1 do
+      get "auth/verify/:token", to: "auth#verify"
       resources :collections, only: [ :index, :show ]
       resources :providers, only: [ :index, :show ] do
         collection do
@@ -22,6 +26,8 @@ Rails.application.routes.draw do
 
       post "auth/register", to: "auth#register"
       post "auth/login", to: "auth#login"
+      post "auth/password/forgot", to: "auth#forgot_password"
+      post "auth/password/reset", to: "auth#reset_password"
       get "me", to: "users#me"
     end
   end
