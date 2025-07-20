@@ -3,12 +3,12 @@ Rails.application.routes.draw do
   mount Rswag::Api::Engine => "/api-docs"
 
 
-  resources :collections, only: [ :index, :show ]
+  
 
   namespace :api do
     namespace :v1 do
       get "auth/verify/:token", to: "auth#verify"
-      resources :collections
+      resources :collections, only: [ :index, :show ]
       resources :providers, only: [ :index, :show ] do
         collection do
           get :search
