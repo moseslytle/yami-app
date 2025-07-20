@@ -1,6 +1,6 @@
 # Created 07/17/2025 by Paulina Salazar.
 # Created 07/18/2025 by Joshua Zhang
-# Merged 07/20/2025 by Joshua Zhang - Implemented different endpoints for both google and yelp search
+# Merged 07/20/2025 by Joshua Zhang - Merged and Implemented different endpoints for both google and yelp search
 
 module Api
   module V1
@@ -33,7 +33,7 @@ module Api
         render json: {
           success: true,
           data: {
-            providers: providers.as_json(only: [ :id, :name, :category, :rating, :review_count, :price_range, :address, :phone, :hours, :image_url ]),
+            providers: providers.as_json(only: [ :id, :name, :category, :rating, :review_count, :price_range, :address, :phone, :hours, :image_url, :favorites_count ]),
             pagination: {
               current_page: page,
               total_pages: total_pages,
@@ -211,7 +211,6 @@ module Api
         category = params[:category]
         latitude = params[:latitude]&.to_f
         longitude = params[:longitude]&.to_f
-
         providers = search_database_providers(q, category, latitude, longitude)
 
         # Add external sources if requested
@@ -220,7 +219,6 @@ module Api
           external_results.concat(fetch_google_places) if ENV["GOOGLE_PLACES_API_KEY"].present?
           external_results.concat(fetch_yelp_businesses) if ENV["YELP_API_KEY"].present?
           save_external_providers(external_results)
-
           # Refresh database search
           providers = search_database_providers(q, category, latitude, longitude)
         end
@@ -262,7 +260,7 @@ module Api
         )
       end
 
-      # Fetch from Yelp (simplified version)
+      # Fetch from Yelp
       def fetch_yelp_businesses
         results = []
         headers = { "Authorization" => "Bearer #{ENV['YELP_API_KEY']}" }
