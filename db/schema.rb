@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_19_222737) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_20_001552) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -65,7 +65,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_19_222737) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "review_count"
+    t.integer "favorites_count", default: 0, null: false
     t.index ["category"], name: "index_providers_on_category"
+    t.index ["favorites_count"], name: "index_providers_on_favorites_count"
     t.index ["google_place_id"], name: "index_providers_on_google_place_id", unique: true
     t.index ["latitude", "longitude"], name: "index_providers_on_latitude_and_longitude"
     t.index ["yelp_id"], name: "index_providers_on_yelp_id", unique: true

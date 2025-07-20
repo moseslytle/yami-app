@@ -7,6 +7,7 @@ Rails.application.routes.draw do
       resources :providers, only: [ :index, :show ] do
         collection do
           get :search
+          get :most_favorited
         end
       end
 

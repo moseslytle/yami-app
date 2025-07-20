@@ -25,6 +25,8 @@ class Api::V1::User::FavoritesController < ApplicationController
     end
   end
 
+
+
   # Removes a favorite for the current user
   #
   # @param provider_id [Integer]  The ID of the provider to unfavorite
