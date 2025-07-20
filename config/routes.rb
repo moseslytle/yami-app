@@ -1,4 +1,10 @@
 Rails.application.routes.draw do
+  mount Rswag::Ui::Engine => "/api-docs"
+  mount Rswag::Api::Engine => "/api-docs"
+
+
+  resources :collections, only: [ :index, :show ]
+
   namespace :api do
     namespace :v1 do
       get "auth/verify/:token", to: "auth#verify"
@@ -6,11 +12,12 @@ Rails.application.routes.draw do
       resources :providers, only: [ :index, :show ] do
         collection do
           get :search
+          get :most_favorited
         end
       end
 
       namespace :user do
-        resources :collections, only: [ :create, :destroy ] do
+        resources :collections, only: [ :create, :destroy, :update ] do
           member do
             put :publish
           end
