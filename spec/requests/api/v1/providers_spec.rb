@@ -1,12 +1,9 @@
 require 'swagger_helper'
 
 RSpec.describe 'api/v1/providers', type: :request do
-
   path '/api/v1/providers/search' do
-
     get('search provider') do
       response(200, 'successful') do
-
         after do |example|
           example.metadata[:response][:content] = {
             'application/json' => {
@@ -20,10 +17,8 @@ RSpec.describe 'api/v1/providers', type: :request do
   end
 
   path '/api/v1/providers' do
-
     get('list providers') do
       response(200, 'successful') do
-
         after do |example|
           example.metadata[:response][:content] = {
             'application/json' => {

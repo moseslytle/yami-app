@@ -11,7 +11,7 @@ class CreateFavorites < ActiveRecord::Migration[8.0]
     # Add dependenices to existing tables
     add_index :favorites, :user_id
     add_index :favorites, :provider_id
-    add_index :favorites, [:user_id, :provider_id], unique: true
+    add_index :favorites, [ :user_id, :provider_id ], unique: true
 
     add_foreign_key :favorites, :users
     add_foreign_key :favorites, :providers

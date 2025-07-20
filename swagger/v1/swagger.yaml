@@ -176,13 +176,7 @@ paths:
       - User Collections
       security:
       - Bearer: []
-      parameters:
-      - name: Authorization
-        in: header
-        description: Bearer token
-        example: Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjo1LCJleHAiOjE3NTMwNTEwMzJ9.VGlzt-hKPZW_zCTfw35FNLJkGnlWgtv6wL6dKiLU5Yc
-        schema:
-          type: string
+      parameters: []
       responses:
         '201':
           description: collection created
@@ -207,10 +201,6 @@ paths:
                   updated_at:
                     type: string
                     format: datetime
-        '422':
-          description: unprocessable entity
-        '401':
-          description: unauthorized
       requestBody:
         content:
           application/json:
@@ -244,13 +234,7 @@ paths:
       - User Collections
       security:
       - Bearer: []
-      parameters:
-      - name: Authorization
-        in: header
-        description: Bearer token
-        example: Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjo1LCJleHAiOjE3NTMwNTEwMzJ9.VGlzt-hKPZW_zCTfw35FNLJkGnlWgtv6wL6dKiLU5Yc
-        schema:
-          type: string
+      parameters: []
       responses:
         '200':
           description: collection updated
@@ -277,10 +261,6 @@ paths:
                     format: datetime
         '404':
           description: collection not found
-        '401':
-          description: unauthorized
-        '422':
-          description: unprocessable entity
       requestBody:
         content:
           application/json:
@@ -303,20 +283,11 @@ paths:
       - User Collections
       security:
       - Bearer: []
-      parameters:
-      - name: Authorization
-        in: header
-        description: Bearer token
-        example: Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjo1LCJleHAiOjE3NTMwNTEwMzJ9.VGlzt-hKPZW_zCTfw35FNLJkGnlWgtv6wL6dKiLU5Yc
-        schema:
-          type: string
       responses:
         '204':
           description: collection deleted
         '404':
           description: collection not found
-        '401':
-          description: unauthorized
   "/api/v1/user/collections/{id}/publish":
     parameters:
     - name: id
@@ -331,13 +302,6 @@ paths:
       - User Collections
       security:
       - Bearer: []
-      parameters:
-      - name: Authorization
-        in: header
-        description: Bearer token
-        example: Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjo1LCJleHAiOjE3NTMwNTEwMzJ9.VGlzt-hKPZW_zCTfw35FNLJkGnlWgtv6wL6dKiLU5Yc
-        schema:
-          type: string
       responses:
         '200':
           description: collection published
@@ -366,10 +330,6 @@ paths:
                     format: datetime
         '404':
           description: collection not found
-        '401':
-          description: unauthorized
-        '422':
-          description: unprocessable entity
   "/api/v1/user/favorites":
     post:
       summary: create favorite
@@ -396,10 +356,10 @@ paths:
         '200':
           description: successful
 servers:
-- url: https://{defaultHost}
+- url: http://{defaultHost}
   variables:
     defaultHost:
-      default: 127.0.0.1
+      default: 127.0.0.1:3000
 components:
   securitySchemes:
     Bearer:

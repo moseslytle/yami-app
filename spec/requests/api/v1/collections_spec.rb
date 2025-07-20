@@ -1,7 +1,6 @@
 require 'swagger_helper'
 
 RSpec.describe 'public collections', type: :request do
-
   # Public collections endpoints
   path '/api/v1/collections' do
     get('list public collections') do
