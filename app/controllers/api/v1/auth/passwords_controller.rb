@@ -1,4 +1,17 @@
+# Created 7/19/2025 by Moses Lytle
+#
+# manages the password reset process including reset token generation
+# a
 class Api::V1::Auth::PasswordsController < ApplicationController
+  # Initiates password reset process by sending reset email
+  #
+  # @param email [String] User's email address
+  # @return [Hash] Success message with :ok status if email found
+  #
+  # @example Request body:
+  #   {
+  #     "email": "john@example.com"
+  #   }
   def forgot
     user = User.find_by(email: params[:email])
     if user
@@ -10,6 +23,19 @@ class Api::V1::Auth::PasswordsController < ApplicationController
     end
   end
 
+  # Resets user password using reset token
+  #
+  # @param token [String] password reset token from email
+  # @param password [String] new password
+  # @param password_confirmation [String] password confirmation
+  # @return [Hash] Success message with :ok status if success
+  #
+  # @example Request body:
+  #   {
+  #     "token": "abc123def456",
+  #     "password": "newpassword123",
+  #     "password_confirmation": "newpassword123"
+  #   }
   def reset
     user = User.find_by(reset_token: params[:token])
 
