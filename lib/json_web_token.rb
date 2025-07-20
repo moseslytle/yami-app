@@ -5,8 +5,8 @@ class JsonWebToken
 
   # Encodes user data into a token
   #
-  # @param payload [Hash] Data to encode in the token (typically user_id)
-  # @param exp [Time] Token expiration time (default: 24 hours from now)
+  # @param payload [Hash] Data to encode in the token
+  # @param exp [Time] Token expiration time
   # @return [String] Encoded  token
   #
   # @example

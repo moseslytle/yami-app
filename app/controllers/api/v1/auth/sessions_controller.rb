@@ -1,7 +1,6 @@
 # Created 7/18/2025 by Moses Lytle
 #
 # This controller manages user login functionality and JWT token generation
-# for authenticated API access.
 class Api::V1::Auth::SessionsController < ApplicationController
   # Authenticates user credentials and returns JWT token
   #
