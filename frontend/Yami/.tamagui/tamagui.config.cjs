@@ -1762,7 +1762,13 @@ Expected a subset of: ${expected.join(", ")}
 };
 
 // tamagui.config.ts
-var tamaguiConfig = createTamagui(defaultConfig);
+var tamaguiConfig = createTamagui({
+  ...defaultConfig,
+  settings: {
+    ...defaultConfig.settings,
+    onlyAllowShorthands: false
+  }
+});
 var tamagui_config_default = tamaguiConfig;
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
