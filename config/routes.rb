@@ -18,7 +18,7 @@ Rails.application.routes.draw do
       end
 
       namespace :user do
-        resources :collections, only: [ :create, :destroy, :update ] do
+        resources :collections, only: [ :create, :destroy, :update, :index ] do
           member do
             put :publish
           end

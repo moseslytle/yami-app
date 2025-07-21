@@ -10,6 +10,11 @@ class Api::V1::User::CollectionsController < ApplicationController
     render status: :unprocessable_entity, json: { errors: e.record.errors }
   end
 
+  def index
+    collection = Current&.user.collections
+    render json: collection
+  end
+
   # Creates a new collection with the provided parameters
   #
   # @param collection_params [Hash] Collection attributes (user_id, title, description, is_public)

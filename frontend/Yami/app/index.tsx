@@ -6,7 +6,7 @@ import { User } from "@tamagui/lucide-icons";
 export default function Index() {
   const router = useRouter();
   const handleNavigateToProfile = () => {
-    router.push("/example");
+    router.push("/collections");
   };
   return (
     <View
