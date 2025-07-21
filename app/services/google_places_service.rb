@@ -1,11 +1,19 @@
 # Created at 07/18/2025 By Joshua - Demo for Search with Google Places API， waiting for actual providers table
+# Updated at 07/20/2025 By Joshua - Add Columbus-specific import functionality
+# Note after standup: save the real time api search and update db function for later daliy auto grep function
 
 require "httparty"
+require "yaml"
 
 # Service class for Google Places API integration
 class GooglePlacesService
   include HTTParty
   base_uri "https://maps.googleapis.com/maps/api/place"
+
+  # Columbus, OH coordinates
+  COLUMBUS_LAT = 39.9612
+  COLUMBUS_LNG = -82.9988
+  COLUMBUS_RADIUS = 25000 # 25km radius
 
   # Put your api key in .env file
   def initialize
