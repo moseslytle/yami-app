@@ -11,6 +11,9 @@ Rails.application.routes.draw do
         collection do
           get :search
           get :most_favorited
+          get "search/google", to: "providers#search_google"
+          get "search/yelp", to: "providers#search_yelp"
+          get "search/all", to: "providers#search_all"
         end
       end
 
