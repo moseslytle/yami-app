@@ -43,6 +43,9 @@ export default function RootLayout() {
         <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
           <Stack>
             <Stack.Screen name="index" options={{ title: "Home" }} />
+            <Stack.Screen name="login" options={{ title: "Sign In", headerShown: false }} />
+            <Stack.Screen name="register" options={{ title: "Create Account", headerShown: false }} />
+            <Stack.Screen name="otp-verification" options={{ title: "Verify Email", headerShown: false }} />
             <Stack.Screen name="collections" options={{ title: "Collections" }} />
           </Stack>
         </ThemeProvider>

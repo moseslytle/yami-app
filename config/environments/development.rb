@@ -34,16 +34,16 @@ Rails.application.configure do
   config.action_mailer.perform_deliveries = true
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
-  
+
   # SMTP settings (using environment variables for security)
   config.action_mailer.smtp_settings = {
-    address: ENV.fetch('SMTP_ADDRESS', 'smtp.gmail.com'),
-    port: ENV.fetch('SMTP_PORT', 587).to_i,
-    domain: ENV.fetch('SMTP_DOMAIN', 'localhost'),
-    user_name: ENV.fetch('SMTP_USERNAME', nil),
-    password: ENV.fetch('SMTP_PASSWORD', nil),
-    authentication: ENV.fetch('SMTP_AUTH', 'plain'),
-    enable_starttls_auto: ENV.fetch('SMTP_STARTTLS', 'true') == 'true',
+    address: ENV.fetch("SMTP_ADDRESS", "smtp.gmail.com"),
+    port: ENV.fetch("SMTP_PORT", 587).to_i,
+    domain: ENV.fetch("SMTP_DOMAIN", "localhost"),
+    user_name: ENV.fetch("SMTP_USERNAME", nil),
+    password: ENV.fetch("SMTP_PASSWORD", nil),
+    authentication: ENV.fetch("SMTP_AUTH", "plain"),
+    enable_starttls_auto: ENV.fetch("SMTP_STARTTLS", "true") == "true",
     open_timeout: 10,
     read_timeout: 10
   }
