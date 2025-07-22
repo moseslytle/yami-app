@@ -1,9 +1,13 @@
+// created 7/22/2025 by Moses Lytle - \
+// updated 7/22/2025 by Moses Lytle - Refactored registration screen to support user flow and add logo
+
 import React, { useState } from 'react';
 import { View, Text, Alert, ScrollView } from 'react-native';
 import { Button, Input, YStack, XStack, H2, Paragraph } from 'tamagui';
 import { useRouter } from 'expo-router';
 import { Eye, EyeOff } from '@tamagui/lucide-icons';
 import { authService } from '../lib/auth';
+import { AdvancedYamiLogo } from '../components/AdvancedYamiLogo';
 
 export default function RegisterScreen() {
     const router = useRouter();
@@ -54,7 +58,7 @@ export default function RegisterScreen() {
                 password: formData.password,
                 password_confirmation: formData.confirmPassword,
             });
-            
+
             console.log('Registration successful:', result);
 
             // Navigate immediately after successful registration
@@ -64,7 +68,7 @@ export default function RegisterScreen() {
                 params: { email: formData.email.toLowerCase().trim() }
             });
             console.log('Navigation call completed');
-            
+
         } catch (error: any) {
             console.error('Registration error:', error);
             // Show the specific error message from the backend
@@ -93,6 +97,15 @@ export default function RegisterScreen() {
                 width="100%"
                 paddingTop="$8"
             >
+                {/* Animated Yami Logo */}
+                <YStack alignItems="center" marginBottom="$4">
+                    <AdvancedYamiLogo
+                        size={100}
+                        primaryColor="#2563eb"
+                        secondaryColor="#7c3aed"
+                    />
+                </YStack>
+
                 <YStack space="$2" alignItems="center">
                     <H2 color="$color">Create Account</H2>
                     <Paragraph color="$color11" textAlign="center">
