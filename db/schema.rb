@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_20_034348) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_22_030543) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -84,7 +84,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_20_034348) do
     t.string "verification_token"
     t.string "reset_token"
     t.datetime "reset_token_expires_at"
+    t.string "otp_code", limit: 6
+    t.datetime "otp_expires_at"
+    t.integer "otp_attempts", default: 0, null: false
+    t.string "totp_secret"
+    t.boolean "totp_enabled", default: false, null: false
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["otp_code"], name: "index_users_on_otp_code"
+    t.index ["totp_enabled"], name: "index_users_on_totp_enabled"
   end
 
   add_foreign_key "collection_items", "collections"

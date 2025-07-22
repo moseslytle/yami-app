@@ -11,23 +11,79 @@
         text-decoration: none;
         border-radius: 5px;
         font-weight: bold;
+        margin: 10px 0;
       }
       .verify-button:hover {
         background-color: #0056b3;
+      }
+      .otp-section {
+        background-color: #f8f9fa;
+        border: 2px solid #007bff;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 20px 0;
+        text-align: center;
+      }
+      .otp-code {
+        font-size: 32px;
+        font-weight: bold;
+        letter-spacing: 8px;
+        color: #007bff;
+        font-family: 'Courier New', monospace;
+        margin: 15px 0;
+      }
+      .divider {
+        text-align: center;
+        margin: 30px 0;
+        color: #6c757d;
+        font-weight: bold;
+      }
+      .warning {
+        background-color: #fff3cd;
+        border: 1px solid #ffeaa7;
+        color: #856404;
+        padding: 15px;
+        border-radius: 5px;
+        margin: 20px 0;
       }
     </style>
   </head>
   <body>
     <h1>Welcome, <%= @user.email %>!</h1>
-    <p>Thank you for registering. Please click the button below to verify your account:</p>
+    <p>Thank you for registering. You can verify your account in two ways:</p>
 
+    <!-- Option 1: Click Button -->
+    <h3> Option 1: Click the Button</h3>
     <p>
       <a href="<%= @url %>" class="verify-button">Verify My Account</a>
     </p>
-
     <p>Or copy and paste this link into your browser:</p>
     <p><%= @url %></p>
 
-    <p>If you did not register, please ignore this email.</p>
+    <div class="divider">-- OR --</div>
+
+    <!-- Option 2: Enter OTP Code -->
+    <% if @otp_code %>
+    <h3> Option 2: Enter This Code in the App</h3>
+    <div class="otp-section">
+      <p><strong>Your verification code is:</strong></p>
+      <div class="otp-code"><%= @otp_code %></div>
+      <p>Enter this code in the app to verify your account</p>
+    </div>
+    <% end %>
+
+    <div class="warning">
+      <strong>Important:</strong>
+      <ul>
+        <% if @otp_code %>
+        <li>The verification code expires in <strong>10 minutes</strong></li>
+        <li>You have <strong>3 attempts</strong> to enter the correct code</li>
+        <% end %>
+        <li>The verification link does not expire</li>
+        <li>Do not share this email with anyone</li>
+      </ul>
+    </div>
+
+    <p>If you did not register for this account, please ignore this email.</p>
   </body>
 </html>
