@@ -1,32 +1,28 @@
-import { Text, View } from "react-native";
-import { Button } from "tamagui";
+import { useEffect } from "react";
 import { useRouter } from "expo-router";
-import { User } from "@tamagui/lucide-icons";
+import { authService } from "../lib/auth";
 
 export default function Index() {
   const router = useRouter();
-  const handleNavigateToProfile = () => {
-    router.push("/collections");
+
+  useEffect(() => {
+    checkAuthStatus();
+  }, []);
+
+  const checkAuthStatus = async () => {
+    try {
+      const isAuthenticated = await authService.isAuthenticated();
+      if (isAuthenticated) {
+        router.replace("/collections");
+      } else {
+        router.replace("/login");
+      }
+    } catch (error) {
+      // If there's an error checking auth, default to login
+      router.replace("/login");
+    }
   };
-  return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text>Hello World Yami.</Text>
-      <Button theme="blue">Hello world</Button>
-      <Button
-        size="$4"
-        theme="blue"
-        icon={User}
-        onPress={handleNavigateToProfile}
-        borderRadius="$4"
-      >
-        Go to Profile
-      </Button>
-    </View>
-  );
+
+  // This component won't render since we redirect immediately
+  return null;
 }

@@ -32,6 +32,17 @@ Rails.application.routes.draw do
         post "password/forgot", to: "passwords#forgot"
         post "password/reset", to: "passwords#reset"
         get  "verify/:token", to: "verifications#verify"
+        
+        # OTP routes for email verification with 6-digit codes
+        post "otp/send", to: "otp#send_code"
+        post "otp/verify", to: "otp#verify_code"
+        
+        # TOTP routes for 2FA (Time-based One-Time Password)
+        post "totp/setup", to: "totp#setup"
+        post "totp/enable", to: "totp#enable"
+        post "totp/disable", to: "totp#disable"
+        post "totp/verify", to: "totp#verify"
+        get "totp/status", to: "totp#status"
       end
 
       get "me", to: "users#me"
