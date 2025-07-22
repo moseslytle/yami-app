@@ -9,7 +9,7 @@ export default function Index() {
   const [providerId, setProviderId] = useState("");
   
   const handleNavigateToProfile = () => {
-    router.push("/example");
+    router.push("/user/profile");
   };
   
   const handleNavigateToProvider = () => {

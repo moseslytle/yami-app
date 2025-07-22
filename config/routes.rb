@@ -23,7 +23,7 @@ Rails.application.routes.draw do
             put :publish
           end
         end
-        resources :favorites, param: :provider_id, only: [ :create, :destroy ]
+        resources :favorites, param: :provider_id, only: [ :index, :create, :destroy ]
       end
 
       namespace :auth do
