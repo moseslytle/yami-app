@@ -3,6 +3,11 @@ class Api::V1::User::CollectionsController < ApplicationController
   before_action :find_collection, only: [ :publish, :update, :destroy ]
   before_action :authorize_collection, only: [ :publish, :update, :destroy ]
 
+  # Publishes a collection by setting its is_public attribute to true
+  #
+  # @param id [Integer] The ID of the collection to publish
+  # @return [Collection] JSON representation of the published collection with :ok status
+  # @return [Hash] Validation errors with :unprocessable_entity status if publishing fails
   def publish
     @collection.publish!
     render json: @collection, status: :ok
@@ -10,9 +15,17 @@ class Api::V1::User::CollectionsController < ApplicationController
     render status: :unprocessable_entity, json: { errors: e.record.errors }
   end
 
+  # Retrieves all collections belonging to the current user
+  #
+  # @return [Array<Collection>] JSON array of user's collections with :ok status
+  def index
+    collection = Current&.user.collections
+    render json: collection
+  end
+
   # Creates a new collection with the provided parameters
   #
-  # @param collection_params [Hash] Collection attributes (user_id, title, description, is_public)
+  # @param collection_params [Hash] Collection attributes (title, description, is_public)
   # @return [Collection] JSON representation of the created collection with :created status
   # @return [Hash] Validation errors with :unprocessable_entity status if creation fails
   def create
@@ -28,7 +41,7 @@ class Api::V1::User::CollectionsController < ApplicationController
   # Updates an existing collection with the provided parameters
   #
   # @param id [Integer] The ID of the collection to update
-  # @param collection_params [Hash] Collection attributes to update (user_id, title, description, is_public)
+  # @param collection_params [Hash] Collection attributes to update (title, description, is_public)
   # @return [Collection] JSON representation of the updated collection with :ok status
   # @return [Hash] Error message with :not_found status if collection doesn't exist
   # @return [Hash] Validation errors with :unprocessable_entity status if update fails
@@ -53,18 +66,28 @@ class Api::V1::User::CollectionsController < ApplicationController
 
   # Filters and validates the required parameters for collection operations
   #
-  # @return [ActionController::Parameters] Permitted parameters containing user_id, title, description, and is_public
-  # @raise [ActionController::ParameterMissing] If any required parameter is missing
+  # @return [ActionController::Parameters] Permitted parameters containing title, description, and is_public
   def collection_params
     params.permit(:title, :description, :is_public)
   end
 
+  # Finds and sets the collection for the current request
+  # Called before publish, update, and destroy actions
+  #
+  # @param id [Integer] The ID of the collection to find
+  # @return [Collection] Sets @collection instance variable
+  # @return [Hash] Error message with :not_found status if collection doesn't exist
   def find_collection
     @collection = Collection.find(params[:id])
   rescue ActiveRecord::RecordNotFound
     render json: { error: "Collection not found" }, status: :not_found
   end
 
+  # Authorizes that the current user owns the collection
+  # Called before publish, update, and destroy actions to ensure proper authorization
+  #
+  # @return [void] Continues execution if user owns the collection
+  # @return [Hash] Error message with :unauthorized status if user doesn't own the collection
   def authorize_collection
     return if @collection&.user_id == Current.user.id
     render json: { error: "User No permission" }, status: :unauthorized

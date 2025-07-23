@@ -10,19 +10,23 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_20_034348) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_23_050714) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "categories", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "collection_items", force: :cascade do |t|
     t.integer "collection_id", null: false
     t.integer "provider_id", null: false
-    t.datetime "added_at"
     t.text "user_note"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["added_at"], name: "index_collection_items_on_added_at"
-    t.index ["collection_id", "provider_id"], name: "index_collection_items_on_collection_id_and_provider_id"
+    t.index ["collection_id", "provider_id"], name: "index_collection_items_on_collection_and_provider_unique", unique: true
     t.index ["collection_id"], name: "index_collection_items_on_collection_id"
     t.index ["provider_id"], name: "index_collection_items_on_provider_id"
   end
@@ -84,7 +88,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_20_034348) do
     t.string "verification_token"
     t.string "reset_token"
     t.datetime "reset_token_expires_at"
+    t.string "otp_code", limit: 6
+    t.datetime "otp_expires_at"
+    t.integer "otp_attempts", default: 0, null: false
+    t.string "totp_secret"
+    t.boolean "totp_enabled", default: false, null: false
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["otp_code"], name: "index_users_on_otp_code"
+    t.index ["totp_enabled"], name: "index_users_on_totp_enabled"
   end
 
   add_foreign_key "collection_items", "collections"
