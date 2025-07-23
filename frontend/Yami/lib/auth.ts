@@ -1,10 +1,21 @@
+// created 7/22/2025 by Moses Lytle
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Constants from 'expo-constants';
 
 // For testing on device, you may need to replace 'localhost' with your computer's IP
 // Example: 'http://192.168.1.100:3000/api/v1'
-const API_BASE_URL = __DEV__ 
+let API_BASE_URL = __DEV__ 
   ? 'http://localhost:3000/api/v1'  // Development (web/simulator)
   : 'http://localhost:3000/api/v1';  // Production
+
+const { expoGoConfig } = Constants;
+const debuggerHost = expoGoConfig?.debuggerHost;
+
+if (debuggerHost) {
+  const ip = debuggerHost.split(':')[0];
+  API_BASE_URL = `http://${ip}:3000/api/v1`;
+}
 
 export interface User {
   id: number;

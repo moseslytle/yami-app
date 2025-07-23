@@ -1,5 +1,5 @@
 // Created 07/20/2025 By Linus Xiong
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import apiClient from '../lib/axios-client';
 
 // Types
@@ -25,11 +25,21 @@ interface UpdateCollectionData {
   is_public?: boolean;
 }
 
+interface PaginatedCollectionsResponse {
+  collections: Collection[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    hasMore: boolean;
+  };
+}
+
 // Public Collections Hooks
 export const usePublicCollections = () => {
   return useQuery({
     queryKey: ['public-collections'],
-    queryFn: async (): Promise<Collection[]> => {
+    queryFn: async (): Promise<PaginatedCollectionsResponse> => {
       const response = await apiClient.get('/api/v1/collections');
       return response.data;
     },
@@ -58,8 +68,11 @@ export const useCreateCollection = () => {
       return response.data;
     },
     onSuccess: () => {
+      // Invalidate all collections queries to ensure lists refresh
       queryClient.invalidateQueries({ queryKey: ['user-collections'] });
       queryClient.invalidateQueries({ queryKey: ['public-collections'] });
+      queryClient.invalidateQueries({ queryKey: ['infinite-public-collections'] });
+      queryClient.invalidateQueries({ queryKey: ['infinite-user-collections'] });
     },
   });
 };
@@ -139,5 +152,22 @@ export const useUserCollection = (id: number) => {
       return response.data;
     },
     enabled: !!id,
+  });
+};
+
+
+
+// Infinite scroll for public collections
+export const useInfinitePublicCollections = (limit: number = 10) => {
+  return useInfiniteQuery({
+    queryKey: ['infinite-public-collections'],
+    queryFn: async ({ pageParam = 1 }): Promise<PaginatedCollectionsResponse> => {
+      const response = await apiClient.get(`/api/v1/collections?page=${pageParam}&limit=${limit}`);
+      return response.data;
+    },
+    getNextPageParam: (lastPage) => {
+      return lastPage.pagination.hasMore ? lastPage.pagination.page + 1 : undefined;
+    },
+    initialPageParam: 1,
   });
 };

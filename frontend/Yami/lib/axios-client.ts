@@ -1,25 +1,25 @@
-// lib/axios-client.ts
+// Created 07/20/2025 by Linus Xiong
 import axios from 'axios';
-import { useAuthStore } from '../store/auth-store';
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
+import { useAuthStore } from '../store/auth-store';
 
 const getBaseURL = () => {
-//   if (__DEV__) {
-//     if (Platform.OS === 'web') {
-//       return 'http://127.0.0.1:3000';
-//     } else {
-//       const { expoGoConfig } = Constants;
-//       const debuggerHost = expoGoConfig?.debuggerHost;
+  if (__DEV__) {
+    if (Platform.OS === 'web') {
+      return 'http://127.0.0.1:3000';
+    } else {
+      const { expoGoConfig } = Constants;
+      const debuggerHost = expoGoConfig?.debuggerHost;
       
-//       if (debuggerHost) {
-//         const ip = debuggerHost.split(':')[0];
-//         return `http://${ip}:3000`;
-//       }
+      if (debuggerHost) {
+        const ip = debuggerHost.split(':')[0];
+        return `http://${ip}:3000`;
+      }
       
-//       return 'http://192.168.1.100:3000';
-//     }
-//   }
+      return 'http://192.168.1.100:3000';
+    }
+  }
   return 'http://127.0.0.1:3000';
 };
 

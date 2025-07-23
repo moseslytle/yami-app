@@ -1,11 +1,29 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, Alert, TextInput } from 'react-native';
-import { Button, YStack, XStack, H2, Paragraph, Input } from 'tamagui';
-import { useRouter, useLocalSearchParams } from 'expo-router';
-import { authService } from '../lib/auth';
+// created 7/22/2025 by Moses Lytle
+// updated 7/22/2025 by Moses Lytle - Created otp verification screen to support user flow and add logo
+
+import Constants from 'expo-constants';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useEffect, useRef, useState } from 'react';
+import { Alert, TextInput, useColorScheme, View } from 'react-native';
+import { Button, H2, Input, Paragraph, XStack, YStack } from 'tamagui';
+import { FloatingBackButton } from '../components/FloatingBackButton';
+
+// API configuration
+let API_BASE_URL = __DEV__ 
+  ? 'http://localhost:3000/api/v1'
+  : 'http://localhost:3000/api/v1';
+  
+const { expoGoConfig } = Constants;
+const debuggerHost = expoGoConfig?.debuggerHost;
+
+if (debuggerHost) {
+  const ip = debuggerHost.split(':')[0];
+  API_BASE_URL = `http://${ip}:3000/api/v1`;
+}
 
 export default function OTPVerificationScreen() {
     const router = useRouter();
+    const colorScheme = useColorScheme();
     const { email } = useLocalSearchParams();
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
     const [isLoading, setIsLoading] = useState(false);
@@ -60,7 +78,7 @@ export default function OTPVerificationScreen() {
         setIsLoading(true);
         try {
             // Call your OTP verification endpoint
-            const response = await fetch('http://localhost:3000/api/v1/auth/otp/verify', {
+            const response = await fetch(`${API_BASE_URL}/auth/otp/verify`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -92,7 +110,7 @@ export default function OTPVerificationScreen() {
     const handleResendOTP = async () => {
         setIsLoading(true);
         try {
-            const response = await fetch('http://localhost:3000/api/v1/auth/otp/send', {
+            const response = await fetch(`${API_BASE_URL}/auth/otp/send`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -124,7 +142,11 @@ export default function OTPVerificationScreen() {
     };
 
     return (
-        <View style={{ flex: 1, backgroundColor: '$background' }}>
+        <View style={{ 
+            flex: 1, 
+            backgroundColor: colorScheme === 'dark' ? '#111111' : '#FFFFFF' 
+        }}>
+            <FloatingBackButton />
             <YStack
                 flex={1}
                 padding="$4"
@@ -135,11 +157,11 @@ export default function OTPVerificationScreen() {
                 width="100%"
             >
                 <YStack space="$2" alignItems="center">
-                    <H2 color="$color" textAlign="center">Verify Your Email</H2>
+                    <H2 color="$color12" textAlign="center">Verify Your Email</H2>
                     <Paragraph color="$color11" textAlign="center">
                         We've sent a 6-digit verification code to
                     </Paragraph>
-                    <Paragraph color="$color" textAlign="center" fontWeight="bold">
+                    <Paragraph color="$color12" textAlign="center" fontWeight="bold">
                         {email}
                     </Paragraph>
                 </YStack>
@@ -161,16 +183,25 @@ export default function OTPVerificationScreen() {
                                 height={60}
                                 fontSize="$6"
                                 fontWeight="bold"
+                                borderColor="$borderColor"
+                                focusStyle={{ borderColor: "$brand" }}
+                                backgroundColor="$background"
+                                color="$color12"
+                                borderRadius="$3"
                             />
                         ))}
                     </XStack>
 
                     <Button
-                        theme="blue"
+                        backgroundColor="$brand"
+                        color="white"
                         size="$4"
                         onPress={handleVerifyOTP}
                         disabled={isLoading || otp.join('').length !== 6}
                         width="100%"
+                        pressStyle={{ backgroundColor: "$brandPress" }}
+                        fontWeight="600"
+                        opacity={otp.join('').length !== 6 ? 0.5 : 1}
                     >
                         {isLoading ? 'Verifying...' : 'Verify Email'}
                     </Button>
@@ -187,6 +218,10 @@ export default function OTPVerificationScreen() {
                             size="$3"
                             onPress={handleResendOTP}
                             disabled={isLoading}
+                            borderColor="$brand"
+                            color="$brand"
+                            backgroundColor="$background"
+                            pressStyle={{ backgroundColor: "$color3" }}
                         >
                             Resend Code
                         </Button>
@@ -200,6 +235,10 @@ export default function OTPVerificationScreen() {
                         variant="outlined"
                         size="$3"
                         onPress={navigateBack}
+                        borderColor="$borderColor"
+                        color="$color11"
+                        backgroundColor="$background"
+                        pressStyle={{ backgroundColor: "$color3" }}
                     >
                         Back to Registration
                     </Button>

@@ -2,13 +2,37 @@
 
 # A class handle all collections operations
 class Api::V1::CollectionsController < ApplicationController
-  # Retrieves a limited list of collections
-  #
-  # @return [Array<Collection>] JSON array of up to 30 collections with :ok status
-  def index
-    collections = Collection.where(is_public: true).limit(30)
-    render json: collections, status: :ok
-  end
+# Retrieves a paginated list of public collections for infinite loading
+#
+# @param page [Integer] The page number (default: 1)
+# @param limit [Integer] The number of collections per page (default: 10, max: 100)
+# @return [Hash] JSON object containing collections array and pagination info with :ok status
+def index
+  page = [ params[:page].to_i, 1 ].max
+  limit = [ [ params[:limit].to_i, 10 ].max, 100 ].min # Default 10, max 100
+  offset = (page - 1) * limit
+
+  # Get total count first
+  total_count = Collection.where(is_public: true).count
+
+  # Get paginated collections
+  collections = Collection.where(is_public: true)
+                         .order(created_at: :desc)
+                         .limit(limit)
+                         .offset(offset)
+
+  has_more = offset + limit < total_count
+
+  render json: {
+    collections: collections,
+    pagination: {
+      page: page,
+      limit: limit,
+      total: total_count,
+      hasMore: has_more
+    }
+  }, status: :ok
+end
 
   # Retrieves a specific collection by ID
   #

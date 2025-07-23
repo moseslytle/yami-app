@@ -22,6 +22,7 @@ Rails.application.routes.draw do
           member do
             put :publish
           end
+          resources :items, only: [ :create, :destroy, :update, :index ]
         end
         resources :favorites, param: :provider_id, only: [ :create, :destroy ]
       end
@@ -32,11 +33,11 @@ Rails.application.routes.draw do
         post "password/forgot", to: "passwords#forgot"
         post "password/reset", to: "passwords#reset"
         get  "verify/:token", to: "verifications#verify"
-        
+
         # OTP routes for email verification with 6-digit codes
         post "otp/send", to: "otp#send_code"
         post "otp/verify", to: "otp#verify_code"
-        
+
         # TOTP routes for 2FA (Time-based One-Time Password)
         post "totp/setup", to: "totp#setup"
         post "totp/enable", to: "totp#enable"
