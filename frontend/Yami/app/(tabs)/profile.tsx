@@ -18,6 +18,7 @@ import {
 } from 'tamagui';
 import { Heart, MapPin, Star, User, Mail, Calendar } from '@tamagui/lucide-icons';
 import { TouchableOpacity } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface User {
   id: number;
@@ -50,6 +51,7 @@ export default function ProfileScreen() {
   const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     fetchUserProfile();
@@ -141,7 +143,7 @@ export default function ProfileScreen() {
         }}
       />
 
-      <ScrollView flex={1} backgroundColor="$background">
+      <ScrollView flex={1} backgroundColor="$background" paddingTop={insets.top}>
         <YStack flex={1} gap="$4">
           
           {/* User Image */}

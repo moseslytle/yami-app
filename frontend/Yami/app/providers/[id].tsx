@@ -17,6 +17,8 @@ import {
 } from 'tamagui';
 import { Star, MapPin, Phone, Clock, Heart } from '@tamagui/lucide-icons';
 import { Alert, Linking, Platform } from 'react-native';
+import {FloatingBackButton} from '../../components/FloatingBackButton';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface Provider {
   id: number;
@@ -44,6 +46,7 @@ export default function ProviderDetailScreen() {
   const [error, setError] = useState<string | null>(null);
   const [isFavorited, setIsFavorited] = useState(false);
   const [imageErrored, setImageErrored] = useState(false);
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     fetchProviderDetails();
@@ -195,8 +198,9 @@ export default function ProviderDetailScreen() {
           ),
         }}
       />
-      
-      <ScrollView flex={1} backgroundColor="$background">
+      <FloatingBackButton />
+      <ScrollView flex={1} backgroundColor="$background" paddingTop={insets.top}>
+        
         <YStack flex={1} gap="$4">
           
           {/* Provider Image */}

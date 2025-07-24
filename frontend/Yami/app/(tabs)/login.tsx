@@ -8,9 +8,9 @@ import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, useColorScheme, View } from 'react-native';
 import { Button, H2, Input, Paragraph, XStack, YStack } from 'tamagui';
-import { AdvancedYamiLogo } from '../components/AdvancedYamiLogo';
-import { FloatingBackButton } from '../components/FloatingBackButton';
-import { useAuthStore } from '../store/auth-store';
+import { AdvancedYamiLogo } from '../../components/AdvancedYamiLogo';
+import { FloatingBackButton } from '../../components/FloatingBackButton';
+import { useAuthStore } from '../../store/auth-store';
 
 // API configuration
 let API_BASE_URL = __DEV__ 

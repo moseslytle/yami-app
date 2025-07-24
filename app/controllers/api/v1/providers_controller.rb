@@ -61,12 +61,12 @@ module Api
         providers = Provider.all
 
         # Filtering based on params.
-        if q.present?
+        if q&.present?
           providers = providers.where("name ILIKE :q OR category ILIKE :q OR address ILIKE :q", q: "%#{q}%")
         end
-        providers = providers.where(category: category) if category.present?
+        providers = providers.where(category: category) if category&.present?
         providers = providers.where("rating >= ?", min_rating) if min_rating > 1
-        providers = providers.where(price_range: price_range) if price_range.present
+        providers = providers.where(price_range: price_range) if price_range&.present
 
 
         # Search sorting orders.
