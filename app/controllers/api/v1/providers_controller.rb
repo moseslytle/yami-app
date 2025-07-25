@@ -1,5 +1,5 @@
-# Created 07/17/2025 by Paulina Salazar.
-# Created 07/18/2025 by Joshua Zhang
+# Created 07/17/2025 by Paulina Salazar. (For Yelp API)
+# Created 07/18/2025 by Joshua Zhang (For google API)
 # Merged 07/20/2025 by Joshua Zhang - Merged and Implemented different endpoints for both google and yelp search
 
 module Api

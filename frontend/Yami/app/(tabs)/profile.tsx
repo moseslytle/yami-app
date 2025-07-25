@@ -1,7 +1,8 @@
 // Create 07/22/2025 by Joshua, first version for profile page
-// Updated 07/25/2025 by Joshua - Integrated with authentication, change the stub to real user data, implement the logout feature. 
-import React, { useEffect, useState } from 'react';
-import { Stack, useRouter } from 'expo-router';
+// Updated 07/25/2025 by Joshua - Integrated with authentication, change the stub to real user data, implement the logout feature.
+// Updated 07/25/2025 by Joshua - Added the focus listener to fix the bug for the favorite status not sync with the user.
+import React, { useEffect, useState, useCallback } from 'react';
+import { Stack, useRouter, useFocusEffect } from 'expo-router';
 import {
   YStack,
   XStack,
@@ -48,7 +49,7 @@ interface Provider {
   name: string;
   address: string;
   rating: number;
-  price_level: string;
+  price_range: string;
   category: string;
   image_url?: string;
 }
@@ -77,6 +78,15 @@ export default function ProfileScreen() {
     fetchUserProfile();
     fetchUserFavorites();
   }, [isAuthenticated]);
+
+  // Refetch favorites when screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      if (isAuthenticated && token) {
+        fetchUserFavorites();
+      }
+    }, [isAuthenticated, token])
+  );
 
   const fetchUserProfile = async () => {
     try {
@@ -331,9 +341,9 @@ export default function ProfileScreen() {
                                 <Text fontSize="$2">{favorite.provider.rating || 'N/A'}</Text>
                               </XStack>
                               
-                              {favorite.provider.price_level && (
+                              {favorite.provider.price_range && (
                                 <Text fontSize="$2" color="green">
-                                  {'$'.repeat(parseInt(favorite.provider.price_level))}
+                                  {'$'.repeat(parseInt(favorite.provider.price_range))}
                                 </Text>
                               )}
                               

@@ -1,6 +1,7 @@
 # Created at 07/18/2025 By Joshua - User favorites controller for create and destroy actions
 # Updated at 07/19/2025 By Joshua - Update for real authentication with Current.user
 # Updated at 07/22/2025 By Joshua - Update for display favorite in profile page
+# Updated at 07/25/2025 By Joshua - Fix the field name and accessor to solve the merge mismatch.
 
 # A class handle user favorite operations
 class Api::V1::User::FavoritesController < ApplicationController
@@ -22,8 +23,8 @@ class Api::V1::User::FavoritesController < ApplicationController
               name: favorite.provider.name,
               address: favorite.provider.address,
               rating: favorite.provider.rating,
-              price_level: favorite.provider.price_level,
-              category: favorite.provider.categories.first&.name,
+              price_range: favorite.provider.price_range,
+              category: favorite.provider.category,
               image_url: favorite.provider.image_url
             },
             created_at: favorite.created_at
