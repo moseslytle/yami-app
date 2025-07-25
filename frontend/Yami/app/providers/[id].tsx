@@ -1,7 +1,7 @@
 //Create 07/21/2025 by Joshua, first version for providers page
-// TODO: Implement favorite toggle API call
+// Updated 07/25/2025 by Joshua - Implemented favorite toggle functionality
 import React, { useEffect, useState } from 'react';
-import { useLocalSearchParams, Stack } from 'expo-router';
+import { useLocalSearchParams, Stack, useRouter } from 'expo-router';
 import {
   YStack,
   XStack,
@@ -19,6 +19,21 @@ import { Star, MapPin, Phone, Clock, Heart } from '@tamagui/lucide-icons';
 import { Alert, Linking, Platform } from 'react-native';
 import {FloatingBackButton} from '../../components/FloatingBackButton';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useAuthStore } from '../../store/auth-store';
+import Constants from 'expo-constants';
+
+// API configuration
+let API_BASE_URL = __DEV__ 
+  ? 'http://localhost:3000/api/v1'
+  : 'http://localhost:3000/api/v1';
+  
+const { expoGoConfig } = Constants;
+const debuggerHost = expoGoConfig?.debuggerHost;
+
+if (debuggerHost) {
+  const ip = debuggerHost.split(':')[0];
+  API_BASE_URL = `http://${ip}:3000/api/v1`;
+}
 
 interface Provider {
   id: number;
@@ -41,11 +56,14 @@ interface Provider {
 
 export default function ProviderDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const router = useRouter();
+  const { token, isAuthenticated } = useAuthStore();
   const [provider, setProvider] = useState<Provider | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isFavorited, setIsFavorited] = useState(false);
   const [imageErrored, setImageErrored] = useState(false);
+  const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
   const insets = useSafeAreaInsets();
 
   useEffect(() => {
@@ -55,14 +73,26 @@ export default function ProviderDetailScreen() {
   const fetchProviderDetails = async () => {
     try {
       setLoading(true);
-      // The provider router here
-      const response = await fetch(`http://localhost:3000/api/v1/providers/${id}`);
+      
+      // Build headers based on authentication status
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+      };
+      
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
+      const response = await fetch(`${API_BASE_URL}/providers/${id}`, { headers });
       const data = await response.json();
       
       if (data.success) {
         setProvider(data.data.provider);
-        setIsFavorited(data.data.provider.is_favorited);
-        setImageErrored(false); // Reset image error state for new provider
+        // Check if user is authenticated to update favorite
+        if (isAuthenticated && token) {
+          checkFavoriteStatus();
+        }
+        setImageErrored(false);
       } else {
         setError('Failed to load provider details');
       }
@@ -70,6 +100,27 @@ export default function ProviderDetailScreen() {
       setError('Network error');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const checkFavoriteStatus = async () => {
+    if (!token) return;
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/user/favorites`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        const isFav = data.data.favorites.some((fav: any) => fav.provider.id === parseInt(id));
+        setIsFavorited(isFav);
+      }
+    } catch (err) {
+      console.error('Failed to check favorite status:', err);
     }
   };
 
@@ -143,8 +194,72 @@ export default function ProviderDetailScreen() {
   };
 
   const toggleFavorite = async () => {
-    // TODO: Implement favorite toggle API call
-    setIsFavorited(!isFavorited);
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      Alert.alert(
+        'Login Required',
+        'You need to be logged in to add favorites',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Login', onPress: () => router.push('/login') }
+        ]
+      );
+      return;
+    }
+
+    if (!provider || isTogglingFavorite) return;
+
+    setIsTogglingFavorite(true);
+    
+    try {
+      if (isFavorited) {
+        // Remove favorite
+        const response = await fetch(`${API_BASE_URL}/user/favorites/${provider.id}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response.ok) {
+          setIsFavorited(false);
+          // Update local favorite count
+          setProvider(prev => prev ? {
+            ...prev,
+            favorites_count: Math.max(0, prev.favorites_count - 1)
+          } : null);
+        } else {
+          throw new Error('Failed to remove favorite');
+        }
+      } else {
+        // Add favorite
+        const response = await fetch(`${API_BASE_URL}/user/favorites`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ provider_id: provider.id }),
+        });
+
+        if (response.ok) {
+          setIsFavorited(true);
+          // Update local favorite count
+          setProvider(prev => prev ? {
+            ...prev,
+            favorites_count: prev.favorites_count + 1
+          } : null);
+        } else {
+          throw new Error('Failed to add favorite');
+        }
+      }
+    } catch (err) {
+      console.error('Failed to toggle favorite:', err);
+      Alert.alert('Error', 'Failed to update favorite status');
+    } finally {
+      setIsTogglingFavorite(false);
+    }
   };
 
   const formatHours = (hours: string | null) => {
@@ -271,11 +386,15 @@ export default function ProviderDetailScreen() {
                   )}
                 </XStack>
 
-                {/* Favorites Count */}
+                {/* Favorites Status */}
                 <XStack alignItems="center" justifyContent="center" gap="$1">
-                  <Heart size={14} color="gray" />
+                  <Heart 
+                    size={14} 
+                    color={isFavorited ? "red" : "gray"} 
+                    fill={isFavorited ? "red" : "transparent"}
+                  />
                   <Text color="gray" fontSize="$2">
-                    {provider.favorites_count} favorites
+                    {provider.favorites_count} {provider.favorites_count === 1 ? 'favorite' : 'favorites'}
                   </Text>
                 </XStack>
 
@@ -362,33 +481,52 @@ export default function ProviderDetailScreen() {
           </Card>
 
           {/* Action Buttons */}
-          <XStack padding="$4" gap="$3">
+          <YStack padding="$4" gap="$3">
+            {/* Favorite Button */}
             <Button
-              flex={1}
               size="$4"
-              theme="blue"
-              icon={Phone}
-              onPress={handleCall}
-              disabled={!provider.phone}
+              onPress={toggleFavorite}
+              disabled={isTogglingFavorite}
+              backgroundColor={isFavorited ? 'red' : '$backgroundPress'}
+              borderWidth={1}
+              borderColor={isFavorited ? 'red' : '$borderColor'}
+              pressStyle={{ scale: 0.98, opacity: 0.8 }}
               fontSize="$4"
               fontWeight="600"
+              icon={Heart}
+              color={isFavorited ? 'white' : '$color'}
             >
-              Call
+              {isTogglingFavorite ? 'Updating...' : isFavorited ? 'Remove from Favorites' : 'Add to Favorites'}
             </Button>
             
-            <Button
-              flex={1}
-              size="$4"
-              theme="green"
-              icon={MapPin}
-              onPress={handleDirections}
-              disabled={!provider.latitude && !provider.address}
-              fontSize="$4"
-              fontWeight="600"
-            >
-              Directions
-            </Button>
-          </XStack>
+            <XStack gap="$3">
+              <Button
+                flex={1}
+                size="$4"
+                theme="blue"
+                icon={Phone}
+                onPress={handleCall}
+                disabled={!provider.phone}
+                fontSize="$4"
+                fontWeight="600"
+              >
+                Call
+              </Button>
+              
+              <Button
+                flex={1}
+                size="$4"
+                theme="green"
+                icon={MapPin}
+                onPress={handleDirections}
+                disabled={!provider.latitude && !provider.address}
+                fontSize="$4"
+                fontWeight="600"
+              >
+                Directions
+              </Button>
+            </XStack>
+          </YStack>
 
           <YStack height="$4" />
         </YStack>

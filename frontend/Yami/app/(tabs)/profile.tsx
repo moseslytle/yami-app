@@ -1,5 +1,5 @@
 // Create 07/22/2025 by Joshua, first version for profile page
-// TODO: Implement the auth
+// Updated 07/25/2025 by Joshua - Integrated with authentication, change the stub to real user data, implement the logout feature. 
 import React, { useEffect, useState } from 'react';
 import { Stack, useRouter } from 'expo-router';
 import {
@@ -16,17 +16,31 @@ import {
   Image,
   Avatar,
 } from 'tamagui';
-import { Heart, MapPin, Star, User, Mail, Calendar } from '@tamagui/lucide-icons';
+import { Heart, MapPin, Star, User, Mail, Calendar, LogOut } from '@tamagui/lucide-icons';
 import { TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useAuthStore } from '../../store/auth-store';
+import Constants from 'expo-constants';
 
-interface User {
+// API configuration
+let API_BASE_URL = __DEV__ 
+  ? 'http://localhost:3000/api/v1'
+  : 'http://localhost:3000/api/v1';
+  
+const { expoGoConfig } = Constants;
+const debuggerHost = expoGoConfig?.debuggerHost;
+
+if (debuggerHost) {
+  const ip = debuggerHost.split(':')[0];
+  API_BASE_URL = `http://${ip}:3000/api/v1`;
+}
+
+interface UserProfile {
   id: number;
   email: string;
-  username: string;
+  name: string;
   created_at: string;
-  favorites_count: number;
-  collections_count: number;
+  is_verified: boolean;
 }
 
 interface Provider {
@@ -34,7 +48,7 @@ interface Provider {
   name: string;
   address: string;
   rating: number;
-  price_range: string;
+  price_level: string;
   category: string;
   image_url?: string;
 }
@@ -47,52 +61,66 @@ interface Favorite {
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
+  const { user: authUser, token, getCurrentUser, isAuthenticated, logout } = useAuthStore();
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const insets = useSafeAreaInsets();
 
+  // Added auth status to work the authenticatation
   useEffect(() => {
+    if (!isAuthenticated) {
+      setLoading(false);
+      return;
+    }
     fetchUserProfile();
     fetchUserFavorites();
-  }, []);
+  }, [isAuthenticated]);
 
   const fetchUserProfile = async () => {
     try {
-      // Using test data until authentication is implemented
-      setUser({
-        id: 1,
-        email: 'user@exp.com',
-        username: 'Joshua',
-        created_at: '2025-07-21 02:06:57.389',
-        favorites_count: 1,
-        collections_count: 1,
+      if (!token) {
+        setError('Not authenticated');
+        return;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/me`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch profile');
+      }
+
+      const data = await response.json();
+      setUserProfile(data.user);
     } catch (err) {
+      console.error('Failed to fetch profile:', err);
       setError('Failed to load profile');
     }
   };
 
   const fetchUserFavorites = async () => {
     try {
-      // Using test data until authentication is implemented
-      setFavorites([
-        {
-          id: 1,
-          provider: {
-            id: 9655,
-            name: 'Wheels Unlimited',
-            address: '1928 E Main St, Columbus, OH 43205, United States',
-            rating: 4.4,
-            price_range: '2',
-            category: 'wheelrimrepair',
-            image_url: 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=ATKogpcT-jVq6z1kDm_5cqz-FRAfYzkh9GPcL0oxvXOJqyd5HHqHOqya-5QqRmuBQewhUciHJkaxIBFuVgti9kno8VMIxihKTS9JddxbVTVcSxU-UAYMMILmb__xQdez3kYZ4LHTw1fQ7X-Ov3RPKsI0qS7RNIPFZ9YOnOlyiW6IymTwAPWJY0rJicAqBR45kv7_5SVBkhhxMIPM7twvma10fcngayYKA4AgzwbG4GE4AHRfKo2Ugs3FWM-bSwdU7lPEGayDm1NHhEPiAYS6R1gkhaIbvvJLg6KIGbQt9oRZEoQaB5S_6S0&key=AIzaSyCOMbOGgsKILum4N2jI5DhTuOZOIzH7OvM'
-          },
-          created_at: '2025-07-21 02:06:57.389'
+      if (!token) return;
+
+      const response = await fetch(`${API_BASE_URL}/user/favorites`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
-        
-      ]);
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch favorites');
+      }
+
+      const data = await response.json();
+      setFavorites(data.data.favorites || []);
     } catch (err) {
       console.error('Failed to fetch favorites:', err);
     } finally {
@@ -114,6 +142,35 @@ export default function ProfileScreen() {
     });
   };
 
+  // Handle logout
+  const handleLogout = async () => {
+    await logout();
+    router.replace('/login');
+  };
+
+  // Check if user is not authenticated
+  if (!isAuthenticated) {
+    return (
+      <YStack flex={1} justifyContent="center" alignItems="center" padding="$4" backgroundColor="$background">
+        <User size="$8" color="$color" opacity={0.3} />
+        <H2 marginTop="$4" color="$color">Please Login First</H2>
+        <Text marginTop="$2" color="$color" opacity={0.7} textAlign="center">
+          You need to be logged in to view your profile
+        </Text>
+        <Button
+          marginTop="$4"
+          size="$4"
+          backgroundColor="$brand"
+          color="white"
+          onPress={() => router.push('/login')}
+          pressStyle={{ backgroundColor: "$brandPress" }}
+        >
+          Go to Login
+        </Button>
+      </YStack>
+    );
+  }
+
   // Status report and error handler
   if (loading) {
       return (
@@ -124,7 +181,7 @@ export default function ProfileScreen() {
       );
     }
   
-    if (error || !user) {
+    if (error || !userProfile) {
       return (
         <YStack flex={1} justifyContent="center" alignItems="center" padding="$4" backgroundColor="$background">
           <Text color="red" textAlign="center" fontSize="$5">
@@ -139,26 +196,56 @@ export default function ProfileScreen() {
       <Stack.Screen
         options={{
           title: 'Profile',
-           headerRight: () => null
+          headerRight: () => (
+            <Button
+              size="$3"
+              icon={LogOut}
+              onPress={handleLogout}
+              backgroundColor="transparent"
+              color="$color"
+              pressStyle={{ backgroundColor: "$backgroundPress" }}
+              marginRight="$3"
+            />
+          )
         }}
       />
 
+      
       <ScrollView flex={1} backgroundColor="$background" paddingTop={insets.top}>
         <YStack flex={1} gap="$4">
           
+          {/* Logout Button */}
+          <XStack justifyContent="flex-end" padding="$4" paddingBottom="$0">
+            <Button
+              size="$3"
+              icon={LogOut}
+              onPress={handleLogout}
+              backgroundColor="$backgroundPress"
+              color="$color"
+              pressStyle={{ backgroundColor: "$backgroundFocus" }}
+            >
+              Logout
+            </Button>
+          </XStack>
+          
           {/* User Image */}
-          <YStack alignItems="center" paddingTop="$4">
+          <YStack alignItems="center" paddingTop="$2">
             <Avatar size="$10" borderWidth={2} borderColor="$borderColor">
-              <Avatar.Image source={{ uri: `https://ui-avatars.com/api/?name=${user.username}&size=200` }} />
+              <Avatar.Image source={{ uri: `https://ui-avatars.com/api/?name=${userProfile.name}&size=200` }} />
               <Avatar.Fallback backgroundColor="$backgroundPress">
                 <Text fontSize="$8" color="$color">
-                  {user.username.charAt(0).toUpperCase()}
+                  {userProfile.name.charAt(0).toUpperCase()}
                 </Text>
               </Avatar.Fallback>
             </Avatar>
             
-            <H2 marginTop="$3">{user.username}</H2>
-            <Text color="$color" opacity={0.7}>{user.email}</Text>
+            <H2 marginTop="$3">{userProfile.name}</H2>
+            <Text color="$color" opacity={0.7}>{userProfile.email}</Text>
+            {userProfile.is_verified && (
+              <XStack gap="$1" alignItems="center" marginTop="$1">
+                <Text fontSize="$2" color="green">✓ Verified</Text>
+              </XStack>
+            )}
           </YStack>
 
           {/* Head Information Card Designed for User*/}
@@ -166,14 +253,14 @@ export default function ProfileScreen() {
             <Card.Header padded>
               <XStack justifyContent="space-around" alignItems="center">
                 <YStack alignItems="center">
-                  <H3>{user.favorites_count}</H3>
+                  <H3>{favorites.length}</H3>
                   <Text fontSize="$2" color="$color" opacity={0.7}>Favorites</Text>
                 </YStack>
                 
                 <Separator vertical height="$4" />
                 
                 <YStack alignItems="center">
-                  <H3>{user.collections_count}</H3>
+                  <H3>0</H3>
                   <Text fontSize="$2" color="$color" opacity={0.7}>Collections</Text>
                 </YStack>
                 
@@ -183,7 +270,7 @@ export default function ProfileScreen() {
                   <Calendar size="$1" color="$color" opacity={0.7} />
                   <Text fontSize="$2" color="$color" opacity={0.7}>Joined</Text>
                   <Text fontSize="$1" color="$color" opacity={0.7}>
-                    {formatDate(user.created_at)}
+                    {formatDate(userProfile.created_at)}
                   </Text>
                 </YStack>
               </XStack>
@@ -244,9 +331,9 @@ export default function ProfileScreen() {
                                 <Text fontSize="$2">{favorite.provider.rating || 'N/A'}</Text>
                               </XStack>
                               
-                              {favorite.provider.price_range && (
+                              {favorite.provider.price_level && (
                                 <Text fontSize="$2" color="green">
-                                  {'$'.repeat(parseInt(favorite.provider.price_range))}
+                                  {'$'.repeat(parseInt(favorite.provider.price_level))}
                                 </Text>
                               )}
                               
