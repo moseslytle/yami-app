@@ -1,6 +1,7 @@
 # Created 07/17/2025 by Paulina Salazar. (For Yelp API)
 # Created 07/18/2025 by Joshua Zhang (For google API)
 # Merged 07/20/2025 by Joshua Zhang - Merged and Implemented different endpoints for both google and yelp search
+# Edited 07/24/2025 by Paulina Salazar - fixed geocoding issues.
 
 module Api
   module V1
@@ -46,6 +47,7 @@ module Api
       end
 
       # Created 07/18/2025 by Paulina Salazar.
+      # Edited 07/24/2025 by Paulina Salazar - fixed geocoding to sort by distance.
       #
       # GET /api/v1/providers/search - Search and filter service providers.
       def search
@@ -57,29 +59,34 @@ module Api
         page = (params[:page] || 1).to_i
         limit = [ (params[:limit] || 20).to_i, 100 ].min
         sort = params[:sort] || "name"
+        latitude = params[:latitude]
+        longitude = params[:longitude]
 
         providers = Provider.all
 
         # Filtering based on params.
-        if q.present?
-          providers = providers.where("name ILIKE :q OR category ILIKE :q OR address ILIKE :q", q: "%#{q}%")
-        end
+        providers = providers.where("name ILIKE :q OR category ILIKE :q", q: "%#{q}%") if q.present?
         providers = providers.where(category: category) if category.present?
         providers = providers.where("rating >= ?", min_rating) if min_rating > 1
-        providers = providers.where(price_range: price_range) if price_range.present
+        providers = providers.where(price_range: price_range) if price_range.present?
 
-
-        # Search sorting orders.
-        providers = case sort
-        when "rating"
-                      providers.order(rating: :desc)
-        when "name"
-                      providers.order(name: :asc)
-        else
-                      providers
+        if latitude.present? && longitude.present?
+          user_location = [latitude.to_f, longitude.to_f]
+          providers = providers.near(user_location, 50, units: :mi)
         end
 
-        total_items = providers.count
+        providers = case sort
+        when "distance"
+          providers.reorder('distance ASC')
+        when "rating"
+          providers.reorder(rating: :desc)
+        when "name"
+          providers.reorder(name: :asc)
+        else
+          providers
+        end
+
+        total_items = providers.except(:select, :order, :limit, :offset).count
         total_pages = (total_items / limit.to_f).ceil
         providers = providers.offset((page - 1) * limit).limit(limit)
 
@@ -87,7 +94,8 @@ module Api
           success: true,
           data: {
             providers: providers.as_json(
-              only: [ :id, :name, :category, :rating, :address, :price_range, :image_url ]
+              only: [ :id, :name, :category, :rating, :address, :price_range, :image_url ],
+              methods: [:distance]
             ),
             search_metadata: {
               query: q,
