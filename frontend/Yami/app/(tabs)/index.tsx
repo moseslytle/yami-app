@@ -1,21 +1,25 @@
 // Created 07/20/2025 by Linus Xiong.
 // Edited 07/21/2025 by Paulina Salazar - implemented index page after it was initialized.
 // Edited 07/22/2025 by Paulina Salazar - implemented no image, redesigned how providers are presented, fixed sorting.
+// Edited 07/23/2025 by Paulina Salazar - implemented filters and sorting dropdown menu, and geolocation with user's permission.
 
 import React, { useState, useEffect } from "react";
 import { ScrollView, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Text, Image, XStack, YStack, Stack, Button, Spinner, Input } from "tamagui";
+import { Text, Image, XStack, YStack, Button, Spinner, Input, Slider, Select } from "tamagui";
 import { useRouter } from "expo-router";
-import { User, Bookmark, Filter, Star, ArrowRight, ArrowLeft } from "@tamagui/lucide-icons";
+import { User, Bookmark, Filter, Star, ArrowRight, ArrowLeft, ArrowDownUp } from "@tamagui/lucide-icons";
 import { useProvider, useProviders, Provider } from "../../hooks/useProviders";
-// import { useCollections } from '../hooks/useCollections';
+import * as Location from "expo-location";
 
+// Constants for sorting options and filtering options.
 const SORT_OPTIONS = [
   { label: "Name Ascending", value: "name" },
   { label: "Highest Rating", value: "rating" },
   { label: "Distance", value: "distance" },
 ];
+const PRICE_RANGES = ["$", "$$", "$$$", "$$$$"];
+const RATINGS = [5, 4, 3, 2, 1];
 
 /**
  * Created 07/21/2025 by Paulina Salazar.
@@ -28,18 +32,20 @@ export default function IndexPage() {
 
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
-  /// Used debouncedSearch to avoid too many API calls.
+  // Used debouncedSearch to avoid too many API calls.
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [sort, setSort] = useState("name");
   const [showFilters, setShowFilters] = useState(false);
+  const [priceFilter, setPriceFilter] = useState<string | null>(null);
+  const [ratingFilter, setRatingFilter] = useState<number | null>(null);
+  const [coords, setCoords] = useState<{ latitude: number; longitude: number } | null>(null);
 
-  // Debounces search so search doesn;t update with every key input.
+  // Debounces search so search doesn't update with every key input.
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(search);
       setPage(1);
     }, 500);
-
     return () => clearTimeout(handler);
   }, [search]);
 
@@ -48,26 +54,39 @@ export default function IndexPage() {
     setPage(1);
   }, [sort]);
 
+  // Request user's location.
+  useEffect(() => {
+    (async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        console.warn("Permission to access location was denied");
+        return;
+      }
+      const location = await Location.getCurrentPositionAsync({});
+      setCoords({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      });
+    })();
+  }, []);
+
   // Get providers with pagination, sort, and search.
   const { data, isLoading, isError, refetch } = useProviders({
     page,
     limit: 10,
     sort,
     search: debouncedSearch,
+    latitude: coords?.latitude,
+    longitude: coords?.longitude,
+    price_range: priceFilter || undefined,
+    min_rating: ratingFilter || undefined,
   });
 
   const goToProvider = (id: string) => {
     router.push(`/providers/${id}`);
   };
 
-  const goToProfile = () => {
-    router.push('/favorites');
-  };
-
-  const goToCollections = () => {
-    router.push('/collections');
-  };
-
+  // Loading animation if anything is loading.
   if (isLoading) {
     return (
       <YStack flex={1} justifyContent="center" alignItems="center">
@@ -76,6 +95,7 @@ export default function IndexPage() {
     );
   }
 
+  // Print error if there is one.
   if (isError) {
     return (
       <YStack flex={1} justifyContent="center" alignItems="center" padding="$4">
@@ -86,11 +106,13 @@ export default function IndexPage() {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1}}>
-      <YStack flex={1} padding={16} gap="$4">
-      <XStack space="$2" alignItems="center">
+   <SafeAreaView style={{ flex: 1}}>
+     <YStack flex={1} padding={16} gap="$4">
+      {/* Search bar design */}
+       <XStack gap="$2" alignItems="center" paddingHorizontal="$2" marginBottom="$2">
         <Input
           flex={1}
+          minWidth={100}
           placeholder="Search providers..."
           value={search}
           onChangeText={setSearch}
@@ -102,41 +124,107 @@ export default function IndexPage() {
           paddingVertical={12}
         />
 
-        <Button size={48} onPress={() => setShowFilters(!showFilters)} icon={Filter}>
-          Filters
-        </Button>
-      </XStack>
+        {/* Filters design, overrode style to match Sort */}
+        <Button
+            onPress={() => setShowFilters((prev) => !prev)}
+            icon={Filter} 
+            size="$4"
+            height={48}
+            borderWidth={1}
+            borderColor="$color4"
+            backgroundColor="$color1"
+            hoverStyle={{ backgroundColor: "$backgroundHover" }}
+            pressStyle={{ backgroundColor: "$backgroundPress" }}
+          >
+            Filters
+         </Button>
 
-      {showFilters && (
-        <XStack gap="$2" flexWrap="wrap">
-          {SORT_OPTIONS.map(({ label, value }) => (
-            <Button
-              key={value}
-              size="$3"
-              chromeless
-              bordered={sort !== value}
-              backgroundColor={sort === value ? "gray" : "transparent"}
-              onPress={() => setSort(value)}
+        {/* Sort dropdown menu design, overrode style to match Filters */}
+         <Select
+          size="$4"
+          value={sort}
+          onValueChange={(value) => setSort(value)}
+          >
+            <Select.Trigger 
+              icon={ArrowDownUp}
+              unstyled={false}
+              size="$4"
+              minWidth={120}
+              maxWidth={150}
+              borderWidth={1}
+              borderColor="$color4"
+              borderRadius="$4"
+              backgroundColor="$color1"
+              height={48}
+              pressStyle={{ backgroundColor: "$backgroundPress" }}
+              hoverStyle={{ backgroundColor: "$backgroundHover" }}
             >
-              <Text color={sort === value ? "white" : "$color"}>{label}</Text>
-            </Button>
-          ))}
+              <Select.Value placeholder="Sort" />
+            </Select.Trigger>
+            <Select.Content>
+              <Select.ScrollUpButton />
+              <Select.Viewport>
+                {SORT_OPTIONS.map(({ label, value }, index) => (
+                  <Select.Item key={value} index={index} value={value}>
+                    <Select.ItemText>{label}</Select.ItemText>
+                  </Select.Item>
+                ))}
+              </Select.Viewport>
+             <Select.ScrollDownButton />
+            </Select.Content>
+          </Select>
         </XStack>
-      )}
+
+        {/* Filters user can pick from */}
+        {showFilters && (
+          <YStack>
+            <Text marginBottom={4}>
+              Filter by Rating
+            </Text>
+            <XStack gap="$2" marginBottom={12}>
+              {RATINGS.map((star) => (
+                <Button
+                  key={star}
+                  size="$2"
+                  onPress={() => setRatingFilter(ratingFilter === star ? null : star) }
+                  icon={Star}
+                  iconAfter={<Text>{star}+</Text>}
+                  chromeless={false}
+                  bordered
+                />
+              ))}
+            </XStack>
+            <Text marginBottom={4}>
+              Filter by Price
+            </Text>
+            <XStack gap="$2">
+              {PRICE_RANGES.map((price) => (
+                <Button
+                  key={price}
+                  size="$2"
+                  onPress={() =>
+                    setPriceFilter(priceFilter === price ? null : price)
+                  }
+                  chromeless={false}
+                  bordered
+                >
+                  {price}
+                </Button>
+              ))}
+            </XStack>
+          </YStack>
+        )}
 
       <ScrollView>
+        {/* Providers information design */}
         {data?.data.providers.map((provider: Provider) => (
           <TouchableOpacity key={provider.id} onPress={() => goToProvider(provider.id)}>
             <YStack
             borderRadius={12}
             overflow="hidden"
             marginBottom={16}
-            shadowColor="black"
-            shadowOpacity={0.1}
-            shadowOffset={{ width: 0, height: 2 }}
-            shadowRadius={6}
             >
-              
+              {/* Provide business image if available, or let user know there isn't one if not */}
               {provider.image_url ? (
                 <Image
                   source={{ uri: provider.image_url }}
@@ -158,15 +246,21 @@ export default function IndexPage() {
               <YStack padding="$3" gap="$2">
                 <Text fontWeight="bold" fontSize={18}>{provider.name}</Text>
                 <Text>
-                  {provider.category} · {provider.price_range} · ⭐{" "}
+                  {provider.category}
+                  {provider.price_range ? ` · ${provider.price_range}` : ""}
+                  {" ·⭐ "}
                   {Number(provider.rating).toFixed(1)}
                   </Text>
+                  {provider.distance !== undefined && provider.distance !== null && (
+                    <Text color="gray">{provider.distance.toFixed(2)} mi away</Text>
+                  )}
                   <Text color="gray">{provider.address}</Text>
                </YStack>
              </YStack>
           </TouchableOpacity>
         ))}
 
+        {/* Button design to pick what page user wants to be on */}
         <YStack flexDirection="row" justifyContent="space-between" paddingVertical={10}>
           <Button disabled={page === 1} onPress={() => setPage((p) => Math.max(p - 1, 1))}
             icon={ArrowLeft}
@@ -181,27 +275,6 @@ export default function IndexPage() {
         </YStack>
       </ScrollView>
     </YStack>
-
-    {/* <XStack
-        borderTopWidth={1}
-        borderColor="#ccc"
-        padding="$3"
-        justifyContent="space-around"
-      >
-        <Button
-          icon={User}
-          size={48}
-          chromeless
-          onPress={goToProfile}
-        />
-        <Button
-          icon={Bookmark}
-          size={48}
-          chromeless
-          onPress={goToCollections}
-        />
-      </XStack> */}
     </SafeAreaView>
-    
   );
 }

@@ -1,4 +1,5 @@
 // Created 07/21/2025 by Paulina Salazar.
+// Edited 07/23/2025 by Paulina Salazar - removed search category as param, implemented location for frontend.
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import apiClient from '../lib/axios-client';
@@ -10,10 +11,8 @@ export interface Provider {
   rating: number;
   price_range: string;
   address: string;
-  phone: string;
-  hours: string;
   image_url: string;
-  favorites_count: number;
+  distance?: number;
 }
 
 interface ProviderPagination {
@@ -37,22 +36,24 @@ export const useProviders = ({
   page = 1,
   sort = "name",
   search = "",
-  category,
   min_rating,
   price_range,
   limit = 20,
+  latitude,
+  longitude,
 }: {
   page?: number;
   sort?: string;
   search?: string;
-  category?: string | null;
   min_rating?: number | null;
   price_range?: string | null;
   limit?: number;
+  latitude?: number;
+  longitude?: number;
 }) => {
   return useQuery({
     // Key based on all parameters.
-    queryKey: ["providers", page, sort, search, category, min_rating, price_range],
+    queryKey: ["providers", page, sort, search, min_rating, price_range, latitude, longitude],
     // Calls API with parameters.
     queryFn: async (): Promise<ProviderResponse> => {
       const response = await apiClient.get("/api/v1/providers/search", {
@@ -60,10 +61,11 @@ export const useProviders = ({
           page,
           sort,
           q: search,
-          category: category ?? undefined,
           min_rating: min_rating && min_rating > 1 ? min_rating : undefined,
           price_range: price_range ?? undefined,
           limit,
+          latitude,
+          longitude,
         },
       });
       return response.data;
