@@ -271,6 +271,7 @@ GEM
     regexp_parser (2.10.0)
     reline (0.6.1)
       io-console (~> 0.5)
+    rotp (6.3.0)
     rspec-core (3.13.5)
       rspec-support (~> 3.13.0)
     rspec-expectations (3.13.5)
@@ -333,6 +334,8 @@ GEM
       rubocop-rails (>= 2.30)
     ruby-progressbar (1.13.0)
     securerandom (0.4.1)
+    sequel (5.94.0)
+      bigdecimal
     solid_cable (3.0.11)
       actioncable (>= 7.2)
       activejob (>= 7.2)
@@ -415,9 +418,11 @@ DEPENDENCIES
   rack-attack
   rack-cors
   rails (~> 8.0.2)
+  rotp
   rspec-rails
   rswag
   rubocop-rails-omakase
+  sequel
   solid_cable
   solid_cache
   solid_queue

@@ -1,5 +1,19 @@
 # Project-6-Ruby-No-Fails
 
+# Demo Video
+https://github.com/user-attachments/assets/2a4e0553-0f73-4b11-8019-5eb1ba952095
+
+# How to run the project
+```bash
+bundle install
+RAILS_ENV=test rails server -b 0.0.0.0
+cd frontend/Yami
+npm install # or bun install
+npx expo start --clear
+```
+Account: a@p-p.men, Password: a@p-p.men
+
+Scan the QR code above with Expo Go (Android) or the Expo Go (iOS), or press i open ios simulator or w open a website
 # Description
 
 Our Project 6 is a web platform designed to connect users with local service providers. The application addresses the challenge of finding reliable services by aggregating and curating information from various sources, including Google and Yelp. Key features include a powerful search and filtering engine (by category, date, and location), user-created personal collections of favorite providers, and a public space for sharing and discovering community-curated lists. The platform aims to simplify the process of finding and organizing local services while fostering a community of users who share valuable recommendations.
@@ -966,7 +980,7 @@ Currently we have all functions needed and their routes implemented in our proje
 The team followed a consistent documentation style throughout the project.  Each file begins with a standardized comment header that includes the name, the creation date, and a clear description of the file’s purpose.  All files, controllers, and models have docs.  Inline comments are used to clarify logic and flow where needed.
 
 ### Testing (Joshua Zhang)
-Team members all tested their code to confirm it was giving consistent and correct results.  Other team members also took team members' code to test and find any bugs.  Moses and Linus tested their authoring function with JWT and postman.  Joshua and Paulina tested their function with rails console and checked the database integrity. [cite: 84, 85]
+Team members all tested their code to confirm it was giving consistent and correct results.  Other team members also took team members' code to test and find any bugs.  Moses and Linus tested their authoring function with JWT and postman.  Joshua and Paulina tested their function with rails console and checked the database integrity.
 
 ---
 
@@ -1099,8 +1113,66 @@ Team members all tested their code to confirm it was giving consistent and corre
 
 ---
 
+### Meeting 4 Report: Presentation Practice and Project Progress Review
+
+* **Date:** July 27, 2025
+* **Duration:** ~3 Hours
+* **Location:** Zoom
+* **Attendance:** All present
+
+#### Meeting Goals
+* Practice and refine presentation delivery for project demonstration
+* Review overall project progress and Sprint 2 completion
+* Coordinate final integration and testing phases
+* Align team on presentation structure and individual speaking roles
+
+#### Personal Goals
+* **Moses:**
+    * Present authentication system enhancements and security features
+    * Demonstrate email verification and OTP implementation
+    * Practice explaining technical architecture decisions
+    * Review integration points with frontend components
+
+* **Linus:**
+    * Showcase collection management system and Ruby controller implementation
+    * Present Expo setup and development environment configuration
+    * Practice demonstrating collection item CRUD functionality
+    * Explain backend-frontend integration for collections
+
+* **Paulina:**
+    * Present service provider data integration and API implementations
+    * Demonstrate main index page and user profile functionality
+    * Practice explaining Yelp and Google Places API integration
+    * Showcase responsive design implementation
+
+* **Joshua:**
+    * Present provider search functionality and frontend development
+    * Demonstrate user authentication pages and provider detail pages
+    * Practice explaining database relationships and favorites system
+    * Showcase end-to-end user flow
+
+#### Discussion Summary
+* **Presentation Practice:**
+    * Each team member practiced their assigned presentation segments multiple times
+    * Refined slide content and visual demonstrations for clarity
+    * Coordinated smooth transitions between different speakers
+    * Rehearsed live demo scenarios and prepared for potential technical issues
+
+* **Project Progress Review:**
+    * Confirmed 100% completion of Sprint 2 objectives (all 14 tasks marked as "Done")
+    * Reviewed successful integration of authentication enhancements
+    * Validated frontend-backend connectivity across all major features
+    * Discussed minor bug fixes and final polish items
+
+
+#### Next Steps
+* **Final Presentation Delivery**
+* **Project Documentation Completion**
+
+---
+
 ## Workload Distribution (Moses, Joshua, Linus, Paulina)
-**Are the contributions and workload balanced across all team members? Why or why not?** [cite: 198, 199]
+**Are the contributions and workload balanced across all team members? Why or why not?**
 
 Yes. Each team member was assigned specific responsibilities in implementing core classes, writing tests, and managing integration.  Code contributions are traceable via the GitHub commits and branching, and all members participated in planning, coding, and reviewing during Sprints 1 and 2.  Responsibilities were divided during these meetings.
 
@@ -1135,7 +1207,7 @@ Yes. All team members reviewed the complete update report and examined the entir
 * **Class definitions, `self` variable, instance variables, class variables, and Modules.**
     * `class`, `module`, `self`, `@instance_variable`
 * **Use of built-in classes: String, Range, Array, Hash, Regexp for data structures.**
-* **Use methods from these classes rather than writing explicit loops, e.g. using the `reduce` and `map` methods in the Array class.** [cite: 229, 230]
+* **Use methods from these classes rather than writing explicit loops, e.g. using the `reduce` and `map` methods in the Array class.**
     * array, hash, string, time, REGEXP
 * **Use of symbols.**
     * Symbols as keys, symbols as options, symbols in validations, in associations, and routes.
@@ -1318,6 +1390,92 @@ Create the project foundation by setting up the database schema, populating it w
 
 ---
 
-# Sprint #2
+# Sprint 2: Frontend Development & Authentication Enhancement
 
-# Continue sprints ...
+### Sprint Goal
+Develop the frontend user interface components, enhance authentication system with email verification and OTP functionality, and integrate backend APIs with the user-facing application.
+
+### Completed Functionality
+
+#### Authentication Enhancements
+* **Email Verification System**: Added comprehensive email verification to user registration process
+* **OTP Implementation**: Integrated multiple OTP verification methods (passkey, TOTP rfc6238)
+* **SMTP Integration**: Configured email delivery system for verification and notifications
+* **Email Templates**: Optimized email templates for better user experience
+
+#### Frontend Development
+* **User Interface Pages**: Complete frontend implementation for all core user interactions
+* **Authentication Pages**: Login and registration pages with enhanced security features
+* **Service Provider Pages**: Provider search, details, and listing interfaces
+* **User Profile Management**: Personal profile pages with favorites functionality
+* **Collections Management**: User collection creation, management, and viewing interfaces
+
+#### System Integration
+* **Expo Setup**: Mobile/cross-platform development environment configuration
+* **API Integration**: Connected frontend components with backend services
+* **User Experience Flow**: Seamless account activation and verification process
+
+### Team Member Work Allocation
+
+#### Moses (Authentication & Backend)
+* **Completed Tasks**:
+    * Implemented email verification system for user registration
+    * Added OTP verification with passkey support
+    * Integrated TOTP rfc6238 authentication
+    * Configured SMTP email delivery system
+    * Optimized email templates for user communications
+    * Created account activation waiting page frontend
+
+#### Joshua (Frontend Development)
+* **Completed Tasks**:
+    * Implemented GET /api/v1/providers/search endpoint
+    * Developed frontend login and register pages
+    * Created provider details pages with full functionality
+    * Built comprehensive user profile pages with favorites integration
+
+#### Linus (Collections & System Setup)
+* **Completed Tasks**:
+    * Configured Expo development environment
+    * Implemented frontend collection pages with full CRUD functionality
+    * Enhanced collection management system
+    * Integrated collection viewing and sharing features
+    * Developed collection item sub-pages
+    * Implemented Ruby controller for collection items CRUD operations
+
+#### Paulina (Frontend Development)
+* **Completed Tasks**:
+    * Developed main index/home page frontend
+    * Created user profile pages with favorites functionality
+    * Implemented responsive design across all user-facing pages
+
+### Deliverables for Sprint #2
+- **Moses**
+    - Complete email verification system integrated with user registration
+    - Multi-factor authentication with OTP (passkey and TOTP rfc6238)
+    - Functional SMTP email delivery system
+    - Optimized email templates and user activation flow
+    - Account activation waiting page for improved user experience
+
+- **Joshua**
+    - Enhanced provider search API endpoint with filtering capabilities
+    - Fully functional login and registration frontend pages
+    - Comprehensive provider detail pages with rich information display
+    - User profile management system with favorites integration
+
+- **Linus**
+    - Configured and operational Expo development environment
+    - Complete frontend collection management system
+    - User-friendly interfaces for creating, editing, and sharing collections
+    - Integrated collection viewing with enhanced user experience
+    - Functional collection item sub-pages with detailed item management
+    - Complete Ruby controller implementation for collection items CRUD operations
+
+- **Paulina**
+    - Professional and responsive main index page
+    - Integrated user profile pages with favorites functionality
+    - Consistent design language across all frontend components
+    - Mobile-responsive layouts for optimal user experience
+
+
+---
+

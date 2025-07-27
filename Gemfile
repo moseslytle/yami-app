@@ -36,13 +36,14 @@ gem "thruster", require: false
 # gem "image_processing", "~> 1.2"
 gem "bcrypt", "~> 3.1.7"
 gem "jwt"
+gem "rotp"  # For TOTP (Time-based One-Time Password) authentication
 
 # HTTP client for API requests
 gem "httparty"
 gem "rswag"
 
 # Reverse geocoding for distance search purposes.
-gem 'geocoder'
+gem "geocoder"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
@@ -55,5 +56,6 @@ group :development, :test do
   gem "sqlite3"
   gem "factory_bot_rails"
   gem "faker"
+  gem "sequel"
   gem "letter_opener"
 end

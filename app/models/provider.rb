@@ -8,7 +8,7 @@ class Provider < ApplicationRecord
   has_many :favorited_by, through: :favorites, source: :user
 
   # Find distance with geocoder, to be accessed in controller.
-  reverse_geocoded_by :latitude, :longitude
-  attr_accessor :distance
+  geocoded_by :address
+  after_validation :geocode, if: :address_changed?
 
 end

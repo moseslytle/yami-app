@@ -31,4 +31,56 @@
 # Ignore master key for decrypting credentials and more.
 /config/master.key
 
+# IDE and editor files
 .idea
+.vscode/
+*.swp
+*.swo
+*~
+
+
+
+# Local secrets and development files
+/tmp/local_secret.txt
+cloudflared-linux-amd64.deb
+
+# Node.js and frontend dependencies 
+**/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Package manager files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+bun.lock
+
+# Build outputs and compiled assets
+**/dist/
+**/build/
+**/.next/
+**/.expo/
+**/.tamagui/
+
+# Cache directories
+**/.cache/
+.parcel-cache/
+.eslintcache
+
+# Coverage reports
+coverage/
+*.lcov
+
+# Database files
+*.sqlite3
+*.db
+
+# Test files and outputs
+/test/tmp/
+/spec/tmp/
+
+# Rails specific
+/config/credentials.yml.enc
+/config/database.yml.example
