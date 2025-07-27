@@ -1,7 +1,7 @@
 # Project-6-Ruby-No-Fails
 
 # Demo Video
-![Demo Video](demo.mov)
+https://github.com/user-attachments/assets/2a4e0553-0f73-4b11-8019-5eb1ba952095
 
 # How to run the project
 ```bash
