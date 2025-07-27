@@ -2,6 +2,7 @@
 # Created 07/18/2025 by Joshua Zhang (For google API)
 # Merged 07/20/2025 by Joshua Zhang - Merged and Implemented different endpoints for both google and yelp search
 # Edited 07/24/2025 by Paulina Salazar - fixed geocoding issues.
+# Edited 07/27/2025 by Paulina Salazar - fixed 500 error.
 
 module Api
   module V1
@@ -48,6 +49,7 @@ module Api
 
       # Created 07/18/2025 by Paulina Salazar.
       # Edited 07/24/2025 by Paulina Salazar - fixed geocoding to sort by distance.
+      # Edited 07/27/2025 by Paulina Salazar - fixed 500 error on initial page load.
       #
       # GET /api/v1/providers/search - Search and filter service providers.
       def search
@@ -90,13 +92,16 @@ module Api
         total_pages = (total_items / limit.to_f).ceil
         providers = providers.offset((page - 1) * limit).limit(limit)
 
+        # Safeguarding against 500 error by checking if coordinates are given on initial load.
+        provider_json = {
+          only: [ :id, :name, :category, :rating, :address, :price_range, :image_url ]
+        }
+        provider_json[:methods] = [:distance] if latitude.present? && longitude.present?
+
         render json: {
           success: true,
           data: {
-            providers: providers.as_json(
-              only: [ :id, :name, :category, :rating, :address, :price_range, :image_url ],
-              methods: [:distance]
-            ),
+            providers: providers.as_json(provider_json),
             search_metadata: {
               query: q,
               filters_applied: {
