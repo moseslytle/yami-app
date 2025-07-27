@@ -6,26 +6,22 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Stack, useRouter, useFocusEffect } from 'expo-router';
 import {
-  YStack,
-  XStack,
-  Text,
-  Spinner,
-  Card,
+  Avatar,
   Button,
-  Separator,
+  Card,
   H2,
   H3,
-  ScrollView,
   Image,
-  Avatar,
+  ScrollView,
+  Separator,
+  Spinner,
+  Text,
+  XStack,
+  YStack,
 } from 'tamagui';
-import { Heart, MapPin, Star, User, Mail, Calendar, LogOut } from '@tamagui/lucide-icons';
-import { TouchableOpacity } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useAuthStore } from '../../store/auth-store';
-import Constants from 'expo-constants';
+import { useUserCollections } from '../../hooks/useCollections';
 import apiClient from '../../lib/axios-client';
-import { useUserCollections } from '../../hooks/useCollections'
+import { useAuthStore } from '../../store/auth-store';
 
 // API configuration
 let API_BASE_URL = __DEV__ 
@@ -76,7 +72,6 @@ export default function ProfileScreen() {
 
   // Added auth status to work the authenticatation
   useEffect(() => {
-    console.log(isAuthenticated)
     if (!isAuthenticated) {
       setLoading(false);
       return;

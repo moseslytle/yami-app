@@ -10,6 +10,13 @@ interface CollectionItem {
   user_note?: string;
   created_at: string;
   updated_at: string;
+  provider: {
+    name: string;
+    category: string;
+    rating: string;
+    image_url: string;
+    price_range?: string;
+  };
 }
 
 interface CreateCollectionItemData {

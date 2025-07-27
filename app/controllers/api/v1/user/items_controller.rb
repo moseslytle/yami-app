@@ -3,12 +3,13 @@ class Api::V1::User::ItemsController < ApplicationController
   before_action :check_exist
   before_action :find_collection_item, except: [ :create, :index ]
 
-  # Retrieves all items in a specific collection
-  #
-  # @return [Array<CollectionItem>] JSON array of all collection items with :ok status
-  def index
-    render json: @collection.collection_items.all
-  end
+# Retrieves all items in a specific collection with provider details
+#
+# @return [Array<CollectionItem>] JSON array of all collection items with provider info and :ok status
+def index
+  items = @collection.collection_items.includes(:provider)
+  render json: items.as_json(include: { provider: { only: [ :name, :category, :rating, :image_url, :price_range ] } })
+end
 
   # Creates a new item in a collection with the provided parameters
   #

@@ -18,6 +18,7 @@ import {
     useTheme,
 } from 'tamagui';
 import { useInfinitePublicCollections } from '../hooks/useCollections';
+import { router } from 'expo-router';
 
 // Types for collections (matching the API structure)
 interface Collection {
@@ -65,7 +66,9 @@ const animationSlow = [
 // Collection Card Component
 function CollectionCard({ collection }: { collection: Collection }) {
   const theme = useTheme();
-  
+  const handlePress = () => {
+    router.push(`/collections/${collection.id}`);
+  };
   // Generate a placeholder image based on collection ID
   const placeholderImage = `https://picsum.photos/400/240?random=${collection.id}`;
 
@@ -76,6 +79,7 @@ function CollectionCard({ collection }: { collection: Collection }) {
         scale: 0.98,
       }}
       marginBottom="$4"
+      onPress={handlePress}
     >
                            <CollectionInner animation="bouncy">
         {/* Image Section */}

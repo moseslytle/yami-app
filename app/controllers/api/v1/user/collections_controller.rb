@@ -1,7 +1,7 @@
 # Created 07/19/2025 By Linus Xiong
 class Api::V1::User::CollectionsController < ApplicationController
-  before_action :find_collection, only: [ :publish, :update, :destroy ]
-  before_action :authorize_collection, only: [ :publish, :update, :destroy ]
+  before_action :find_collection, only: [ :publish, :update, :destroy, :show ]
+  before_action :authorize_collection, only: [ :publish, :update, :destroy, :show ]
 
   # Publishes a collection by setting its is_public attribute to true
   #
@@ -60,6 +60,10 @@ class Api::V1::User::CollectionsController < ApplicationController
   # @return [void] No content returned if deletion is successful
   def destroy
     @collection.destroy
+  end
+
+  def show
+    render json: @collection
   end
 
   private
