@@ -56,5 +56,6 @@ group :development, :test do
   gem "sqlite3"
   gem "factory_bot_rails"
   gem "faker"
+  gem "sequel"
   gem "letter_opener"
 end
