@@ -283,12 +283,14 @@ export default function IndexPage() {
 									<Text fontWeight="bold" fontSize={18}>
 										{provider.name}
 									</Text>
-									<Text>
-										{provider.category}
-										{provider.price_range ? ` · ${provider.price_range}` : ""}
-										{" ·⭐ "}
-										{Number(provider.rating).toFixed(1)}
-									</Text>
+									<XStack alignItems="center" gap="$1">
+										<Text>
+											{provider.category}
+											{provider.price_range ? ` · ${provider.price_range} · ` : " · "}
+										</Text>
+										<Star size={14} color="gold" />
+										<Text> {Number(provider.rating).toFixed(1)} </Text>
+									</XStack>
 									{provider.distance !== undefined &&
 										provider.distance !== null && (
 											<Text color="gray">
