@@ -2,8 +2,9 @@
 import { Plus } from '@tamagui/lucide-icons';
 import { BlurView } from 'expo-blur';
 import React, { useState } from 'react';
-import { useColorScheme, View } from 'react-native';
+import { useColorScheme, View, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import {
   Button,
   H1,
@@ -11,11 +12,29 @@ import {
 } from 'tamagui';
 import CreateCollectionModal from '../../components/CreateCollectionModal';
 import VerticalCollectionsList from '../../components/VerticalCollectionsList';
+import { useAuthStore } from '../../store/auth-store';
 
 export default function CollectionsScreen() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme();
+  const { isAuthenticated } = useAuthStore();
+  const router = useRouter();
+
+  const handleOpenCreateModal = () => {
+    if (!isAuthenticated) {
+      Alert.alert(
+        'Login Required',
+        'You need to be logged in to create collections',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Login', onPress: () => router.push('/login') }
+        ]
+      );
+      return;
+    }
+    setShowCreateModal(true);
+  };
 
   return (
     <View style={{ 
@@ -26,11 +45,11 @@ export default function CollectionsScreen() {
       width: '100%',
     }}>
       {/* Collections List - render first per expo-blur docs */}
-              <View style={{ 
-          flex: 1, 
-          paddingTop: insets.top + 45,
-        }}>
-        <VerticalCollectionsList onCreateCollection={() => setShowCreateModal(true)} />
+      <View style={{ 
+        flex: 1, 
+        paddingTop: insets.top + 45,
+      }}>
+        <VerticalCollectionsList onCreateCollection={handleOpenCreateModal} />
       </View>
 
       {/* Floating Header with Blur Effect - render after dynamic content */}
@@ -63,7 +82,6 @@ export default function CollectionsScreen() {
             flex={1}
             justifyContent="space-between" 
             alignItems="center"
-            // paddingVertical="$2"
             paddingHorizontal="$5"
           >
             <H1 
@@ -80,7 +98,7 @@ export default function CollectionsScreen() {
               backgroundColor="$brand"
               color="white"
               icon={Plus}
-              onPress={() => setShowCreateModal(true)}
+              onPress={handleOpenCreateModal}
               pressStyle={{
                 backgroundColor: "$brandPress",
                 scale: 0.9,
@@ -102,4 +120,4 @@ export default function CollectionsScreen() {
       />
     </View>
   );
-} 
+}

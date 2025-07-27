@@ -17,7 +17,7 @@ import {
 } from 'tamagui';
 import { Star, MapPin, Phone, Clock, Heart } from '@tamagui/lucide-icons';
 import { Alert, Linking, Platform } from 'react-native';
-import {FloatingBackButton} from '../../components/FloatingBackButton';
+import { FloatingBackButton } from '../../components/FloatingBackButton';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuthStore } from '../../store/auth-store';
 import Constants from 'expo-constants';

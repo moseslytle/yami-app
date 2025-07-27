@@ -1,6 +1,7 @@
 // Create 07/22/2025 by Joshua, first version for profile page
 // Updated 07/25/2025 by Joshua - Integrated with authentication, change the stub to real user data, implement the logout feature.
 // Updated 07/25/2025 by Joshua - Added the focus listener to fix the bug for the favorite status not sync with the user.
+// Updated 07/27/2025 By Linus - Replace api request with apiClient to handle 401 cases and log out of login status.
 import React, { useEffect, useState, useCallback } from 'react';
 import { Stack, useRouter, useFocusEffect } from 'expo-router';
 import {
@@ -22,6 +23,8 @@ import { TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuthStore } from '../../store/auth-store';
 import Constants from 'expo-constants';
+import apiClient from '../../lib/axios-client';
+import { useUserCollections } from '../../hooks/useCollections'
 
 // API configuration
 let API_BASE_URL = __DEV__ 
@@ -68,9 +71,11 @@ export default function ProfileScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const insets = useSafeAreaInsets();
+  const collections= useUserCollections();
 
   // Added auth status to work the authenticatation
   useEffect(() => {
+    console.log(isAuthenticated)
     if (!isAuthenticated) {
       setLoading(false);
       return;
@@ -94,20 +99,8 @@ export default function ProfileScreen() {
         setError('Not authenticated');
         return;
       }
-
-      const response = await fetch(`${API_BASE_URL}/me`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch profile');
-      }
-
-      const data = await response.json();
-      setUserProfile(data.user);
+      const data = await apiClient.get(`/api/v1/me`);
+      setUserProfile(data.data.user);
     } catch (err) {
       console.error('Failed to fetch profile:', err);
       setError('Failed to load profile');
@@ -118,18 +111,7 @@ export default function ProfileScreen() {
     try {
       if (!token) return;
 
-      const response = await fetch(`${API_BASE_URL}/user/favorites`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch favorites');
-      }
-
-      const data = await response.json();
+      const data = await apiClient.get(`/api/v1/user/favorites`);
       setFavorites(data.data.favorites || []);
     } catch (err) {
       console.error('Failed to fetch favorites:', err);
@@ -155,7 +137,6 @@ export default function ProfileScreen() {
   // Handle logout
   const handleLogout = async () => {
     await logout();
-    router.replace('/login');
   };
 
   // Check if user is not authenticated
@@ -270,7 +251,7 @@ export default function ProfileScreen() {
                 <Separator vertical height="$4" />
                 
                 <YStack alignItems="center">
-                  <H3>0</H3>
+                  <H3>{collections.data?.length}</H3>
                   <Text fontSize="$2" color="$color" opacity={0.7}>Collections</Text>
                 </YStack>
                 

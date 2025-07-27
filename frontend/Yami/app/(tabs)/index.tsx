@@ -8,8 +8,8 @@ import { ScrollView, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Text, Image, XStack, YStack, Button, Spinner, Input, Slider, Select } from "tamagui";
 import { useRouter } from "expo-router";
-import { User, Bookmark, Filter, Star, ArrowRight, ArrowLeft, ArrowDownUp } from "@tamagui/lucide-icons";
-import { useProvider, useProviders, Provider } from "../../hooks/useProviders";
+import { Filter, Star, ArrowRight, ArrowLeft, ArrowDownUp } from "@tamagui/lucide-icons";
+import { useProviders, Provider } from "../../hooks/useProviders";
 import * as Location from "expo-location";
 
 // Constants for sorting options and filtering options.

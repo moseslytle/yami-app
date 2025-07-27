@@ -124,7 +124,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     if (!token) return null;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/user/profile`, {
+      const response = await fetch(`${API_BASE_URL}/me`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
