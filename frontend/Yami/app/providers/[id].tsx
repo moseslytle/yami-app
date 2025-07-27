@@ -1,27 +1,29 @@
 //Create 07/21/2025 by Joshua, first version for providers page
 // Updated 07/25/2025 by Joshua - Implemented favorite toggle functionality
 // Updated 07/27/2025 by Joshua - Fix the provider hours error when it's null.
+// Updated 07/27/2025 By Linus - Add add to collection button
+import { Clock, Heart, MapPin, Phone, Plus, Star } from '@tamagui/lucide-icons';
+import Constants from 'expo-constants';
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { useLocalSearchParams, Stack, useRouter } from 'expo-router';
+import { Alert, Linking, Platform } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
-  YStack,
-  XStack,
-  Text,
-  Spinner,
-  Card,
   Button,
-  Separator,
-  H2,
+  Card,
+  H4,
+  Image,
   Paragraph,
   ScrollView,
-  Image,
+  Separator,
+  Spinner,
+  Text,
+  XStack,
+  YStack
 } from 'tamagui';
-import { Star, MapPin, Phone, Clock, Heart } from '@tamagui/lucide-icons';
-import { Alert, Linking, Platform } from 'react-native';
+import { AddToCollectionModal } from '../../components/AddToCollectionModal';
 import { FloatingBackButton } from '../../components/FloatingBackButton';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuthStore } from '../../store/auth-store';
-import Constants from 'expo-constants';
 
 // API configuration
 let API_BASE_URL = __DEV__ 
@@ -65,6 +67,7 @@ export default function ProviderDetailScreen() {
   const [isFavorited, setIsFavorited] = useState(false);
   const [imageErrored, setImageErrored] = useState(false);
   const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
+  const [showAddToCollectionModal, setShowAddToCollectionModal] = useState(false);
   const insets = useSafeAreaInsets();
 
   useEffect(() => {
@@ -352,7 +355,7 @@ export default function ProviderDetailScreen() {
           <Card elevate size="$4" margin="$4" marginTop="$2">
             <Card.Header padded>
               <YStack gap="$2">
-                <H2 color="$color" textAlign="center">{provider.name}</H2>
+                <H4 color="$color" textAlign="center">{provider.name}</H4>
                 <Text 
                   color="gray" 
                   fontSize="$4" 
@@ -483,6 +486,33 @@ export default function ProviderDetailScreen() {
 
           {/* Action Buttons */}
           <YStack padding="$4" gap="$3">
+            {/* Add to Collection Button */}
+            <Button
+              size="$4"
+              onPress={() => {
+                if (!isAuthenticated) {
+                  Alert.alert(
+                    'Login Required',
+                    'You need to be logged in to add providers to collections',
+                    [
+                      { text: 'Cancel', style: 'cancel' },
+                      { text: 'Login', onPress: () => router.push('/login') }
+                    ]
+                  );
+                  return;
+                }
+                setShowAddToCollectionModal(true);
+              }}
+              backgroundColor="$brand"
+              color="white"
+              pressStyle={{ scale: 0.98, opacity: 0.8 }}
+              fontSize="$4"
+              fontWeight="600"
+              icon={Plus}
+            >
+              Add to Collection
+            </Button>
+
             {/* Favorite Button */}
             <Button
               size="$4"
@@ -532,6 +562,14 @@ export default function ProviderDetailScreen() {
           <YStack height="$4" />
         </YStack>
       </ScrollView>
+      {provider && (
+        <AddToCollectionModal
+          isVisible={showAddToCollectionModal}
+          onClose={() => setShowAddToCollectionModal(false)}
+          providerId={provider.id}
+          providerName={provider.name}
+        />
+      )}
     </>
   );
 }

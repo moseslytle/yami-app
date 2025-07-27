@@ -1,24 +1,24 @@
 // Created 07/22/2025 by Linus Xiong - Vertical Collections List with Infinite Scroll
-import { Plus } from '@tamagui/lucide-icons';
+import { Plus, Trash2 } from '@tamagui/lucide-icons';
 import type { AnimationProp } from '@tamagui/web';
-import React, { useCallback } from 'react';
-import { FlatList, RefreshControl } from 'react-native';
-import {
-    Button,
-    Card,
-    Circle,
-    H3,
-    Image,
-    Paragraph,
-    Spinner,
-    Text,
-    View,
-    YStack,
-    styled,
-    useTheme,
-} from 'tamagui';
-import { useInfinitePublicCollections } from '../hooks/useCollections';
 import { router } from 'expo-router';
+import React, { useCallback } from 'react';
+import { Alert, FlatList, RefreshControl } from 'react-native';
+import {
+  Button,
+  Card,
+  Circle,
+  H3,
+  Image,
+  Paragraph,
+  Spinner,
+  Text,
+  View,
+  YStack,
+  styled,
+  useTheme
+} from 'tamagui';
+import { useDeleteCollection, useInfinitePublicCollections, useUserCollections } from '../hooks/useCollections';
 
 // Types for collections (matching the API structure)
 interface Collection {
@@ -33,6 +33,8 @@ interface Collection {
 
 interface VerticalCollectionsListProps {
   onCreateCollection?: () => void;
+  showOnlyMyCollections?: boolean;
+  isAuthenticated?: boolean;
 }
 
 // Animations
@@ -64,11 +66,39 @@ const animationSlow = [
 ] as AnimationProp;
 
 // Collection Card Component
-function CollectionCard({ collection }: { collection: Collection }) {
+function CollectionCard({ collection, showOnlyMyCollections, isAuthenticated }: { collection: Collection; showOnlyMyCollections: boolean; isAuthenticated: boolean }) {
   const theme = useTheme();
+  const deleteCollection = useDeleteCollection();
+
   const handlePress = () => {
-    router.push(`/collections/${collection.id}`);
+    const params = showOnlyMyCollections ? `?showOnlyMyCollections=true` : '';
+    router.push(`/collections/${collection.id}${params}`);
   };
+
+  const handleDelete = async () => {
+    if (!isAuthenticated || !showOnlyMyCollections) return;
+
+    Alert.alert(
+      'Delete Collection',
+      `Are you sure you want to delete "${collection.title}"? This action cannot be undone and will remove all items in this collection.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Delete', 
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deleteCollection.mutateAsync(collection.id);
+            } catch (error) {
+              console.error('Failed to delete collection:', error);
+              Alert.alert('Error', 'Failed to delete collection. Please try again.');
+            }
+          }
+        }
+      ]
+    );
+  };
+
   // Generate a placeholder image based on collection ID
   const placeholderImage = `https://picsum.photos/400/240?random=${collection.id}`;
 
@@ -81,7 +111,7 @@ function CollectionCard({ collection }: { collection: Collection }) {
       marginBottom="$4"
       onPress={handlePress}
     >
-                           <CollectionInner animation="bouncy">
+      <CollectionInner animation="bouncy">
         {/* Image Section */}
         <View
           position="relative"
@@ -143,9 +173,40 @@ function CollectionCard({ collection }: { collection: Collection }) {
               {collection.title}
             </H3>
           </View>
+
+          {/* Delete Button - only show in user's collections */}
+          {isAuthenticated && showOnlyMyCollections && (
+            <View
+              position="absolute"
+              top="$3"
+              right="$3"
+              zIndex={10}
+            >
+              <Button
+                size="$2"
+                circular
+                backgroundColor="rgba(255, 255, 255, 0.9)"
+                color="$red10"
+                icon={Trash2}
+                onPress={(e) => {
+                  e.stopPropagation(); // Prevent card press
+                  handleDelete();
+                }}
+                pressStyle={{
+                  backgroundColor: "rgba(255, 255, 255, 1)",
+                  scale: 0.9,
+                }}
+                shadowColor="rgba(0, 0, 0, 0.3)"
+                shadowOffset={{ width: 0, height: 2 }}
+                shadowOpacity={0.5}
+                shadowRadius={4}
+                elevation={4}
+              />
+            </View>
+          )}
         </View>
 
-                {/* Content Section */}
+        {/* Content Section */}
         <YStack padding="$3" space="$2">
           {collection.description && (
             <Paragraph
@@ -171,29 +232,54 @@ function CollectionCard({ collection }: { collection: Collection }) {
 }
 
 // Main Component
-export function VerticalCollectionsList({ onCreateCollection }: VerticalCollectionsListProps) {
+export function VerticalCollectionsList({ 
+  onCreateCollection, 
+  showOnlyMyCollections = false,
+  isAuthenticated = false 
+}: VerticalCollectionsListProps) {
   const theme = useTheme();
+  
+  // Use different data sources based on authentication and filter state
+  const publicCollectionsQuery = useInfinitePublicCollections(10);
+  const userCollectionsQuery = useUserCollections();
+
+  // Determine which data source to use
+  const shouldUseUserCollections = isAuthenticated && showOnlyMyCollections;
+  
   const {
-    data,
+    data: infiniteData,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-    isLoading,
-    refetch,
-  } = useInfinitePublicCollections(10);
+    isLoading: infiniteLoading,
+    refetch: infiniteRefetch,
+  } = publicCollectionsQuery;
 
-  // Flatten the pages data
-  const collections = data?.pages.flatMap(page => page.collections) ?? [];
+  const {
+    data: userData,
+    isLoading: userLoading,
+    refetch: userRefetch,
+  } = userCollectionsQuery;
+
+  // Determine final state based on current mode
+  const isLoading = shouldUseUserCollections ? userLoading : infiniteLoading;
+  const refetch = shouldUseUserCollections ? userRefetch : infiniteRefetch;
+
+  // Flatten the pages data for infinite scroll or use user data directly
+  const collections = shouldUseUserCollections 
+    ? (userData ?? [])
+    : (infiniteData?.pages.flatMap(page => page.collections) ?? []);
 
   const handleLoadMore = useCallback(() => {
-    if (hasNextPage && !isFetchingNextPage) {
+    // Only allow load more for public collections (infinite scroll)
+    if (!shouldUseUserCollections && hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, [shouldUseUserCollections, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const renderItem = useCallback(({ item }: { item: Collection }) => (
-    <CollectionCard collection={item} />
-  ), []);
+    <CollectionCard collection={item} showOnlyMyCollections={showOnlyMyCollections} isAuthenticated={isAuthenticated} />
+  ), [showOnlyMyCollections, isAuthenticated]);
 
   const renderFooter = useCallback(() => {
     if (!isFetchingNextPage) return null;
@@ -201,9 +287,9 @@ export function VerticalCollectionsList({ onCreateCollection }: VerticalCollecti
     return (
       <View padding="$4" alignItems="center">
         <Spinner size="large" color="$color11" />
-                 <Text fontSize="$3" color="$color9" marginTop="$2">
-           Loading more collections...
-         </Text>
+        <Text fontSize="$3" color="$color9" marginTop="$2">
+          Loading more collections...
+        </Text>
       </View>
     );
   }, [isFetchingNextPage]);
@@ -254,7 +340,7 @@ export function VerticalCollectionsList({ onCreateCollection }: VerticalCollecti
 
   if (isLoading) {
     return (
-            <View flex={1} alignItems="center" justifyContent="center">
+      <View flex={1} alignItems="center" justifyContent="center">
         <Spinner size="large" color="$brand" />
         <Text fontSize="$4" color="$color11" marginTop="$3">
           Loading collections...
@@ -273,7 +359,7 @@ export function VerticalCollectionsList({ onCreateCollection }: VerticalCollecti
         onEndReachedThreshold={0.5}
         ListFooterComponent={renderFooter}
         ListEmptyComponent={renderEmpty}
-                         refreshControl={
+        refreshControl={
           <RefreshControl
             refreshing={false}
             onRefresh={refetch}

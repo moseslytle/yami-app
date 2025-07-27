@@ -8,7 +8,7 @@ class Api::V1::User::ItemsController < ApplicationController
 # @return [Array<CollectionItem>] JSON array of all collection items with provider info and :ok status
 def index
   items = @collection.collection_items.includes(:provider)
-  render json: items.as_json(include: { provider: { only: [ :name, :category, :rating, :image_url, :price_range ] } })
+  render json: items.as_json(include: { provider: { only: [ :name, :category, :rating, :image_url, :price_range, :favorites_count ] } })
 end
 
   # Creates a new item in a collection with the provided parameters
@@ -65,16 +65,21 @@ end
     params.permit(:provider_id, :user_note)
   end
 
-  # Finds and sets the collection for the current user
-  # Called before all actions to ensure the collection exists and belongs to the current user
+  # Finds and sets the collection for the current request
+  # Supports both owned collections and public collections
+  # Called before all actions to ensure the collection exists and is accessible
   #
   # @param collection_id [Integer] The ID of the collection to find
   # @return [Collection] Sets @collection instance variable
-  # @return [Hash] Error message with :not_found status if collection doesn't exist
+  # @return [Hash] Error message with :not_found status if collection doesn't exist or is inaccessible
   def check_exist
-    @collection = Current.user.collections.find(params[:collection_id])
-  rescue ActiveRecord::RecordNotFound
-    render json: { error: "Record not found" }, status: :not_found
+    @collection = Collection.where(id: params[:collection_id])
+                           .where("user_id = ? OR is_public = ?", Current.user.id, true)
+                           .first
+
+    unless @collection
+      render json: { error: "Collection not found or access denied" }, status: :not_found
+    end
   end
 
   # Finds and sets the collection item within the collection
@@ -86,6 +91,6 @@ end
   def find_collection_item
     @item = @collection.collection_items.find(params[:id])
   rescue ActiveRecord::RecordNotFound
-    render json: { error: "Record not found" }, status: :not_found
+    render json: { error: "Item not found" }, status: :not_found
   end
 end

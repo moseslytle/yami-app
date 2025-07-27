@@ -1,14 +1,14 @@
 // Created by Linus Xiong - Collections Page with Infinite Scroll
-import { Plus } from '@tamagui/lucide-icons';
+import { Plus, User } from '@tamagui/lucide-icons';
 import { BlurView } from 'expo-blur';
-import React, { useState } from 'react';
-import { useColorScheme, View, Alert } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import { Alert, useColorScheme, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
-  Button,
-  H1,
-  XStack
+    Button,
+    H1,
+    XStack
 } from 'tamagui';
 import CreateCollectionModal from '../../components/CreateCollectionModal';
 import VerticalCollectionsList from '../../components/VerticalCollectionsList';
@@ -16,6 +16,7 @@ import { useAuthStore } from '../../store/auth-store';
 
 export default function CollectionsScreen() {
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showOnlyMyCollections, setShowOnlyMyCollections] = useState(false);
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme();
   const { isAuthenticated } = useAuthStore();
@@ -36,6 +37,21 @@ export default function CollectionsScreen() {
     setShowCreateModal(true);
   };
 
+  const handleToggleMyCollections = () => {
+    if (!isAuthenticated) {
+      Alert.alert(
+        'Login Required',
+        'You need to be logged in to view your collections',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Login', onPress: () => router.push('/login') }
+        ]
+      );
+      return;
+    }
+    setShowOnlyMyCollections(!showOnlyMyCollections);
+  };
+
   return (
     <View style={{ 
       flex: 1, 
@@ -49,7 +65,11 @@ export default function CollectionsScreen() {
         flex: 1, 
         paddingTop: insets.top + 45,
       }}>
-        <VerticalCollectionsList onCreateCollection={handleOpenCreateModal} />
+        <VerticalCollectionsList 
+          onCreateCollection={handleOpenCreateModal}
+          showOnlyMyCollections={showOnlyMyCollections && isAuthenticated}
+          isAuthenticated={isAuthenticated}
+        />
       </View>
 
       {/* Floating Header with Blur Effect - render after dynamic content */}
@@ -92,23 +112,50 @@ export default function CollectionsScreen() {
             >
               Collections
             </H1>
-            <Button
-              size="$4"
-              circular
-              backgroundColor="$brand"
-              color="white"
-              icon={Plus}
-              onPress={handleOpenCreateModal}
-              pressStyle={{
-                backgroundColor: "$brandPress",
-                scale: 0.9,
-              }}
-              shadowColor="$brand"
-              shadowOffset={{ width: 0, height: 4 }}
-              shadowOpacity={0.3}
-              shadowRadius={12}
-              elevation={8}
-            />
+            
+            <XStack gap="$2" alignItems="center">
+              {/* My Collections Filter Button - only show when authenticated */}
+              {isAuthenticated && (
+                <Button
+                  size="$3"
+                  circular
+                  backgroundColor={showOnlyMyCollections ? "$brand" : "transparent"}
+                  borderWidth={1}
+                  borderColor={showOnlyMyCollections ? "$brand" : "$borderColor"}
+                  color={showOnlyMyCollections ? "white" : (colorScheme === 'dark' ? '#F5F5F5' : '#111111')}
+                  icon={User}
+                  onPress={handleToggleMyCollections}
+                  pressStyle={{
+                    scale: 0.9,
+                    opacity: 0.8,
+                  }}
+                  shadowColor={showOnlyMyCollections ? "$brand" : "transparent"}
+                  shadowOffset={showOnlyMyCollections ? { width: 0, height: 2 } : { width: 0, height: 0 }}
+                  shadowOpacity={showOnlyMyCollections ? 0.3 : 0}
+                  shadowRadius={showOnlyMyCollections ? 8 : 0}
+                  elevation={showOnlyMyCollections ? 4 : 0}
+                />
+              )}
+              
+              {/* Create Collection Button */}
+              <Button
+                size="$4"
+                circular
+                backgroundColor="$brand"
+                color="white"
+                icon={Plus}
+                onPress={handleOpenCreateModal}
+                pressStyle={{
+                  backgroundColor: "$brandPress",
+                  scale: 0.9,
+                }}
+                shadowColor="$brand"
+                shadowOffset={{ width: 0, height: 4 }}
+                shadowOpacity={0.3}
+                shadowRadius={12}
+                elevation={8}
+              />
+            </XStack>
           </XStack>
         </BlurView>
       </View>

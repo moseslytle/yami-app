@@ -3,8 +3,12 @@
 // Updated 07/25/2025 by Joshua - Added the focus listener to fix the bug for the favorite status not sync with the user.
 // Updated 07/27/2025 By Linus - Replace api request with apiClient to handle 401 cases and log out of login status.
 // Updated 07/27/2025 by Joshua - Fix the duplicate request for nromal and focus user request.
-import React, { useEffect, useState, useCallback } from 'react';
-import { Stack, useRouter, useFocusEffect } from 'expo-router';
+import { Calendar, Heart, LogOut, MapPin, Star, User } from '@tamagui/lucide-icons';
+import Constants from 'expo-constants';
+import { Stack, useFocusEffect, useRouter } from 'expo-router';
+import React, { useCallback, useEffect, useState } from 'react';
+import { TouchableOpacity } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   Avatar,
   Button,
@@ -19,7 +23,7 @@ import {
   XStack,
   YStack,
 } from 'tamagui';
-import { useUserCollections } from '../../hooks/useCollections';
+import { Collection, useUserCollections } from '../../hooks/useCollections';
 import apiClient from '../../lib/axios-client';
 import { useAuthStore } from '../../store/auth-store';
 
@@ -65,10 +69,11 @@ export default function ProfileScreen() {
   const { user: authUser, token, getCurrentUser, isAuthenticated, logout } = useAuthStore();
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [favorites, setFavorites] = useState<Favorite[]>([]);
+  const [collections, setCollections] = useState<Collection[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const insets = useSafeAreaInsets();
-  const collections= useUserCollections();
+
 
   // Added auth status to work the authenticatation
   useEffect(() => {
@@ -79,13 +84,19 @@ export default function ProfileScreen() {
     fetchUserProfile();
   }, [isAuthenticated]);
 
+  // Get collections data using the hook
+  const collectionsQuery = useUserCollections(isAuthenticated);
+
   // Fetch favorites when screen comes into focus, fix for the duplicate request for nromal and focus user request
   useFocusEffect(
     useCallback(() => {
       if (isAuthenticated && token) {
+        if (collectionsQuery.data) {
+          setCollections(collectionsQuery.data);
+        }
         fetchUserFavorites();
       }
-    }, [isAuthenticated, token])
+    }, [isAuthenticated, token, collectionsQuery.data])
   );
 
   const fetchUserProfile = async () => {
@@ -132,7 +143,7 @@ export default function ProfileScreen() {
   // Handle logout
   const handleLogout = async () => {
     await logout();
-    router.replace('/login');
+    router.replace('/');
   };
 
   // Check if user is not authenticated
@@ -198,7 +209,7 @@ export default function ProfileScreen() {
       />
 
       
-      <ScrollView flex={1} backgroundColor="$background" paddingTop={insets.top}>
+      <ScrollView flex={1} backgroundColor="$background" paddingTop={insets.top} showsVerticalScrollIndicator={false}>
         <YStack flex={1} gap="$4">
           
           {/* Logout Button */}
@@ -247,7 +258,7 @@ export default function ProfileScreen() {
                 <Separator vertical height="$4" />
                 
                 <YStack alignItems="center">
-                  <H3>{collections.data?.length}</H3>
+                  <H3>{collections.length}</H3>
                   <Text fontSize="$2" color="$color" opacity={0.7}>Collections</Text>
                 </YStack>
                 

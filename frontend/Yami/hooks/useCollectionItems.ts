@@ -16,6 +16,7 @@ interface CollectionItem {
     rating: string;
     image_url: string;
     price_range?: string;
+    favorites_count: number;
   };
 }
 
@@ -30,17 +31,36 @@ interface UpdateCollectionItemData {
 }
 
 // Get collection items for a specific collection
-export const useCollectionItems = (collectionId: number) => {
+export const useCollectionItems = (collectionId: number, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['collection-items', collectionId],
     queryFn: async (): Promise<CollectionItem[]> => {
       const response = await apiClient.get(`/api/v1/user/collections/${collectionId}/items`);
       return response.data;
     },
-    enabled: !!collectionId,
+    enabled: !!collectionId && enabled,
   });
 };
 
+// Get public collection items (no authentication required)
+export const usePublicCollectionItems = (collectionId: number, enabled: boolean = true) => {
+  return useQuery({
+    queryKey: ['public-collection-items', collectionId],
+    queryFn: async (): Promise<CollectionItem[]> => {
+      const response = await apiClient.get(`/api/v1/collections/${collectionId}/items`);
+      return response.data;
+    },
+    enabled: !!collectionId && enabled,
+  });
+};
+
+// Get collection items (public or user) based on authentication status
+export const useCollectionItemsWithAuth = (collectionId: number, isAuthenticated: boolean = false) => {
+  const publicQuery = usePublicCollectionItems(collectionId, !isAuthenticated);
+  const userQuery = useCollectionItems(collectionId, isAuthenticated);
+  
+  return isAuthenticated ? userQuery : publicQuery;
+};
 
 
 // Create a new collection item

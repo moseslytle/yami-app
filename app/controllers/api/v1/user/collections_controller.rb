@@ -94,6 +94,7 @@ class Api::V1::User::CollectionsController < ApplicationController
   # @return [Hash] Error message with :unauthorized status if user doesn't own the collection
   def authorize_collection
     return if @collection&.user_id == Current.user.id
+    return if @collection&.is_public == true
     render json: { error: "User No permission" }, status: :unauthorized
   end
 end

@@ -3,7 +3,7 @@ import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tansta
 import apiClient from '../lib/axios-client';
 
 // Types
-interface Collection {
+export interface Collection {
   id: number;
   user_id: number;
   title: string;
@@ -46,14 +46,14 @@ export const usePublicCollections = () => {
   });
 };
 
-export const usePublicCollection = (id: number) => {
+export const usePublicCollection = (id: number, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['public-collection', id],
     queryFn: async (): Promise<Collection> => {
       const response = await apiClient.get(`/api/v1/collections/${id}`);
       return response.data;
     },
-    enabled: !!id, // Execute the query only if the id exists
+    enabled: !!id && enabled, // Execute the query only if the id exists and enabled
   });
 };
 
@@ -133,28 +133,36 @@ export const usePublishCollection = () => {
 };
 
 // Getting a user's collection
-export const useUserCollections = () => {
+export const useUserCollections = (enabled: boolean = true) => {
   return useQuery({
     queryKey: ['user-collections'],
     queryFn: async (): Promise<Collection[]> => {
       const response = await apiClient.get('/api/v1/user/collections');
       return response.data;
     },
+    enabled,
   });
 };
 
 // Get a single user's collection.
-export const useUserCollection = (id: number) => {
+export const useUserCollection = (id: number, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['user-collection', id],
     queryFn: async (): Promise<Collection> => {
       const response = await apiClient.get(`/api/v1/user/collections/${id}`);
       return response.data;
     },
-    enabled: !!id,
+    enabled: !!id && enabled,
   });
 };
 
+// Get a collection (public or user) based on authentication status
+export const useCollection = (id: number, isAuthenticated: boolean = false) => {
+  const publicQuery = usePublicCollection(id, !isAuthenticated);
+  const userQuery = useUserCollection(id, isAuthenticated);
+  
+  return isAuthenticated ? userQuery : publicQuery;
+};
 
 
 // Infinite scroll for public collections

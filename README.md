@@ -966,7 +966,7 @@ Currently we have all functions needed and their routes implemented in our proje
 The team followed a consistent documentation style throughout the project.  Each file begins with a standardized comment header that includes the name, the creation date, and a clear description of the file’s purpose.  All files, controllers, and models have docs.  Inline comments are used to clarify logic and flow where needed.
 
 ### Testing (Joshua Zhang)
-Team members all tested their code to confirm it was giving consistent and correct results.  Other team members also took team members' code to test and find any bugs.  Moses and Linus tested their authoring function with JWT and postman.  Joshua and Paulina tested their function with rails console and checked the database integrity. [cite: 84, 85]
+Team members all tested their code to confirm it was giving consistent and correct results.  Other team members also took team members' code to test and find any bugs.  Moses and Linus tested their authoring function with JWT and postman.  Joshua and Paulina tested their function with rails console and checked the database integrity.
 
 ---
 
@@ -1100,7 +1100,7 @@ Team members all tested their code to confirm it was giving consistent and corre
 ---
 
 ## Workload Distribution (Moses, Joshua, Linus, Paulina)
-**Are the contributions and workload balanced across all team members? Why or why not?** [cite: 198, 199]
+**Are the contributions and workload balanced across all team members? Why or why not?**
 
 Yes. Each team member was assigned specific responsibilities in implementing core classes, writing tests, and managing integration.  Code contributions are traceable via the GitHub commits and branching, and all members participated in planning, coding, and reviewing during Sprints 1 and 2.  Responsibilities were divided during these meetings.
 
@@ -1135,7 +1135,7 @@ Yes. All team members reviewed the complete update report and examined the entir
 * **Class definitions, `self` variable, instance variables, class variables, and Modules.**
     * `class`, `module`, `self`, `@instance_variable`
 * **Use of built-in classes: String, Range, Array, Hash, Regexp for data structures.**
-* **Use methods from these classes rather than writing explicit loops, e.g. using the `reduce` and `map` methods in the Array class.** [cite: 229, 230]
+* **Use methods from these classes rather than writing explicit loops, e.g. using the `reduce` and `map` methods in the Array class.**
     * array, hash, string, time, REGEXP
 * **Use of symbols.**
     * Symbols as keys, symbols as options, symbols in validations, in associations, and routes.
