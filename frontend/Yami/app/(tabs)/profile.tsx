@@ -2,6 +2,7 @@
 // Updated 07/25/2025 by Joshua - Integrated with authentication, change the stub to real user data, implement the logout feature.
 // Updated 07/25/2025 by Joshua - Added the focus listener to fix the bug for the favorite status not sync with the user.
 // Updated 07/27/2025 By Linus - Replace api request with apiClient to handle 401 cases and log out of login status.
+// Updated 07/27/2025 by Joshua - Fix the duplicate request for nromal and focus user request.
 import React, { useEffect, useState, useCallback } from 'react';
 import { Stack, useRouter, useFocusEffect } from 'expo-router';
 import {
@@ -81,10 +82,9 @@ export default function ProfileScreen() {
       return;
     }
     fetchUserProfile();
-    fetchUserFavorites();
   }, [isAuthenticated]);
 
-  // Refetch favorites when screen comes into focus
+  // Fetch favorites when screen comes into focus, fix for the duplicate request for nromal and focus user request
   useFocusEffect(
     useCallback(() => {
       if (isAuthenticated && token) {
@@ -99,8 +99,8 @@ export default function ProfileScreen() {
         setError('Not authenticated');
         return;
       }
-      const data = await apiClient.get(`/api/v1/me`);
-      setUserProfile(data.data.user);
+      const response = await apiClient.get(`/api/v1/me`);
+      setUserProfile(response.data.user);
     } catch (err) {
       console.error('Failed to fetch profile:', err);
       setError('Failed to load profile');
@@ -111,8 +111,8 @@ export default function ProfileScreen() {
     try {
       if (!token) return;
 
-      const data = await apiClient.get(`/api/v1/user/favorites`);
-      setFavorites(data.data.favorites || []);
+      const response = await apiClient.get(`/api/v1/user/favorites`);
+      setFavorites(response.data.data.favorites || []);
     } catch (err) {
       console.error('Failed to fetch favorites:', err);
     } finally {
@@ -137,6 +137,7 @@ export default function ProfileScreen() {
   // Handle logout
   const handleLogout = async () => {
     await logout();
+    router.replace('/login');
   };
 
   // Check if user is not authenticated

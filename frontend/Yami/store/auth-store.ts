@@ -1,5 +1,6 @@
 // Created 07/20/2025 By Linus Xiong
 // Updated 07/22/2025 By Linus Xiong - Enhanced with user management and additional auth methods
+// Updated 07/27/2025 by Joshua Zhang - Refactor for the response parsing.
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
@@ -139,7 +140,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         return null;
       }
 
-      const user = await response.json();
+      const data = await response.json();
+      const user = data.user;
       set({ user });
       return user;
     } catch (error) {

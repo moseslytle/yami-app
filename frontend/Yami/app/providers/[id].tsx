@@ -1,5 +1,6 @@
 //Create 07/21/2025 by Joshua, first version for providers page
 // Updated 07/25/2025 by Joshua - Implemented favorite toggle functionality
+// Updated 07/27/2025 by Joshua - Fix the provider hours error when it's null.
 import React, { useEffect, useState } from 'react';
 import { useLocalSearchParams, Stack, useRouter } from 'expo-router';
 import {
@@ -44,7 +45,7 @@ interface Provider {
   address: string;
   phone: string;
   price_range: string;
-  hours: string;
+  hours: string | null;
   image_url: string;
   favorites_count: number;
   latitude: string;
