@@ -74,7 +74,7 @@ coverage/
 *.lcov
 
 # Database files
-*.sqlite3
+# *.sqlite3
 *.db
 
 # Test files and outputs
@@ -84,3 +84,6 @@ coverage/
 # Rails specific
 /config/credentials.yml.enc
 /config/database.yml.example
+*.sqlite3-wal
+*.sqlite3-shm
+.DS_Store

@@ -6,7 +6,7 @@ https://github.com/user-attachments/assets/2a4e0553-0f73-4b11-8019-5eb1ba952095
 # How to run the project
 ```bash
 bundle install
-RAILS_ENV=test rails server -b 0.0.0.0
+rails server -b 0.0.0.0
 cd frontend/Yami
 npm install # or bun install
 npx expo start --clear
@@ -14,6 +14,12 @@ npx expo start --clear
 Account: a@p-p.men, Password: a@p-p.men
 
 Scan the QR code above with Expo Go (Android) or the Expo Go (iOS), or press i open ios simulator or w open a website
+
+## How to run test case
+```bash
+bundle exec rspec spec/requests/api/v1/collections_spec.rb spec/requests/api/v1/user/collections_spec.rb spec/requests/api/v1/user/collection_items_spec.rb --format progress
+```
+
 # Description
 
 Our Project 6 is a web platform designed to connect users with local service providers. The application addresses the challenge of finding reliable services by aggregating and curating information from various sources, including Google and Yelp. Key features include a powerful search and filtering engine (by category, date, and location), user-created personal collections of favorite providers, and a public space for sharing and discovering community-curated lists. The platform aims to simplify the process of finding and organizing local services while fostering a community of users who share valuable recommendations.
@@ -1476,6 +1482,150 @@ Develop the frontend user interface components, enhance authentication system wi
     - Consistent design language across all frontend components
     - Mobile-responsive layouts for optimal user experience
 
+---
+
+# A THOROUGH list of content covered in the lecture material on MVC and Rails that can be found in the team's final solution.
+
+## Paulina Salazar
+
+**Model:** created a model of ApplicationRecord inheritance.
+
+**View:** JSON rendering (as_json)
+
+**Controller:** created Provider controller with ApplicationController inheritance, with three main GET routes (index, search, show) that use ActiveRecord.
+
+**Ruby on Rails:** usage of ActiveRecord queries (reorder, order, find_by, .limit, .offset, .all), rendered as json (as_json), usage of params, updated migrations for creating a table, updating with attributes and data.
+
+## Joshua Zhang
+
+**Controllers:**
+- API namespace structure (Api::V1::ProvidersController)
+- RESTful actions (index, show, create, destroy)
+- RESTful API endpoints
+- Controller inheritance from ApplicationController
+- API-specific controllers (ActionController::API)
+
+**Models:**
+- ActiveRecord models (Provider, Favorite)
+- Model associations (has_many, belongs_to, through)
+- Counter cache for performance
+- Model validations (scope)
+- Callbacks (after_validation)
+
+**Views:**
+- JSON API responses instead of HTML views
+- Structured JSON formatting
+
+**Routing:**
+- RESTful routes with resources
+- Provider and favorites routes
+- Namespace routing for API
+
+**Rails:**
+- Migrations (creating tables, adding columns/indexes, foreign keys)
+- Query optimization with includes
+- Database queries (where, order, limit, offset)
+
+**Services:**
+- Service objects for external API integration
+- HTTParty for API requests
+
+## Moses Lytle
+
+**Controller:**
+- Authentication controllers (RegistrationsController, SessionsController, OtpController, PasswordsController, TotpController, VerificationsController)
+- RESTful authentication endpoints (register, login, logout, password reset)
+- Controller inheritance from ApplicationController
+- JWT token generation and validation
+
+**Auth Endpoints:**
+- POST /api/v1/auth/register
+- POST /api/v1/auth/login
+- POST /api/v1/auth/password/forgot
+- POST /api/v1/auth/password/reset
+- GET /api/v1/auth/verify/:token
+- POST /api/v1/auth/otp/send
+- POST /api/v1/auth/otp/verify
+- GET /api/v1/me
+
+**Model:**
+- User model with ActiveRecord inheritance
+- BCrypt password encryption (has_secure_password) (password_digest)
+- Model validations (email format, uniqueness, password strength)
+- Model dependencies
+- foreign key, Primary key relations
+- Model callbacks (before_create :generate_verification_token)
+- Authentication token management
+- Email verification system with token expiration
+
+**View:**
+- Login and register interface
+- Logo SVG design
+- Json rendering
+
+**Rails:**
+- SMTP config
+- Updated Migrations and
+- render JSON
+- bcrypt
+- jwt
+
+## Linus Xiong
+
+**Controller:**
+```
+GET    /api/v1/collections/:id/items(.:format)                                                           api/v1/collections#items
+GET    /api/v1/collections(.:format)                                                                     api/v1/collections#index
+GET    /api/v1/collections/:id(.:format)                                                                 api/v1/collections#show
+PUT    /api/v1/user/collections/:id/publish(.:format)                                                    api/v1/user/collections#publish
+GET    /api/v1/user/collections/:collection_id/items(.:format)                                           api/v1/user/items#index
+POST   /api/v1/user/collections/:collection_id/items(.:format)                                           api/v1/user/items#create
+PATCH  /api/v1/user/collections/:collection_id/items/:id(.:format)                                       api/v1/user/items#update
+PUT    /api/v1/user/collections/:collection_id/items/:id(.:format)                                       api/v1/user/items#update
+DELETE /api/v1/user/collections/:collection_id/items/:id(.:format)                                       api/v1/user/items#destroy
+GET    /api/v1/user/collections(.:format)                                                                api/v1/user/collections#index
+POST   /api/v1/user/collections(.:format)                                                                api/v1/user/collections#create
+GET    /api/v1/user/collections/:id(.:format)                                                            api/v1/user/collections#show
+PATCH  /api/v1/user/collections/:id(.:format)                                                            api/v1/user/collections#update
+PUT    /api/v1/user/collections/:id(.:format)                                                            api/v1/user/collections#update
+DELETE /api/v1/user/collections/:id(.:format)
+```
+
+**Models:**
+- ActiveRecord models (Collection, Collection Item, Current)
+- Model associations (has_many, belongs_to, through)
+- Model validations (scope)
+- Callbacks (after_validation)
+
+**Views:**
+- Collection display interface
+- Collection creation interface
+- Add item to collection interface
+- Delete collection and item functionality
+- Global tab bar
+- State management
+- Request library encapsulation
+
+**Rails:**
+- Migrations (creating tables, adding columns/indexes, foreign keys)
+- Validation Middleware
+- Rate Limit
+- CORS control
+- Database Configuration
+- Unit Test
+- Integration of Swagger Docs
 
 ---
+
+## Final Submission Contributions
+
+For each team member, state the specific contributions TO THE FINAL SUBMISSION. Note if a team member worked on code that did not make it into the final solution then DO NOT include this in the README.
+
+**Paulina Salazar:** Implemented yelp_importer to import Yelp data to our database, wrote Provider search, index, show routes, implemented Geocoder for Provider model to calculate distance, implemented category_importer to migrate categories to database, implemented index page to allow users to search for providers, connected Provider search route to frontend with hooks.
+
+**Joshua Zhang:** Implemented user favorites controller, providers controller for google API using, favorite model, google importer service for importing the google place providers information, google_place_service for real time api search. Favorites, add counts, add constraints for db migration. Authored user profile page and provider details page, refactor the authenticator and logout logic to work with user information and manage favorites.
+
+**Moses Lytle:** Implemented complete authentication system including user registration with email verification, secure login/logout with JWT tokens, OTP email verification system, password reset functionality, TOTP 2FA support, React Native frontend authentication screens with custom advanced animated Yami logo component, comprehensive security measures with rate limiting and token expiration, email delivery system, and full authentication API with RESTful endpoints.
+
+**Linus:** I implemented the backend design for the collection and collection item models, database design, and developed APIs for collections and collection items at both the user level and public level. I also added a global validation middleware for Ruby, achieving single-point control for global authentication, which reduced a lot of repetitive code defined in functions. On the frontend, I defined a global tab bar and completed a series of functions such as displaying, modifying, and deleting collections and collection items. Additionally, I packaged a unified state management and request API interceptor for my teammates.
 
