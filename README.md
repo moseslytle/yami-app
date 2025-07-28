@@ -6,7 +6,7 @@ https://github.com/user-attachments/assets/2a4e0553-0f73-4b11-8019-5eb1ba952095
 # How to run the project
 ```bash
 bundle install
-RAILS_ENV=test rails server -b 0.0.0.0
+rails server -b 0.0.0.0
 cd frontend/Yami
 npm install # or bun install
 npx expo start --clear
@@ -14,6 +14,12 @@ npx expo start --clear
 Account: a@p-p.men, Password: a@p-p.men
 
 Scan the QR code above with Expo Go (Android) or the Expo Go (iOS), or press i open ios simulator or w open a website
+
+## How to run test case
+```bash
+bundle exec rspec spec/requests/api/v1/collections_spec.rb spec/requests/api/v1/user/collections_spec.rb spec/requests/api/v1/user/collection_items_spec.rb --format progress
+```
+
 # Description
 
 Our Project 6 is a web platform designed to connect users with local service providers. The application addresses the challenge of finding reliable services by aggregating and curating information from various sources, including Google and Yelp. Key features include a powerful search and filtering engine (by category, date, and location), user-created personal collections of favorite providers, and a public space for sharing and discovering community-curated lists. The platform aims to simplify the process of finding and organizing local services while fostering a community of users who share valuable recommendations.

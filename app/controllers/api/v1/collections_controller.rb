@@ -1,8 +1,13 @@
 # Created at 07/17/2025 By Linus Xiong - The CRUD code for all collections has been initially completed, but it still needs to add validation for the parameters passed by the middleware.
+# Updated at 07/23/2025 By Linus Xiong - add pagination for the collections index
+# Updated at 07/27/2025 By Linus Xiong - add items for the collections show
 
 # A class handle all collections operations
 class Api::V1::CollectionsController < ApplicationController
   before_action :find_public_collection, only: [ :show, :items ]
+
+# Created at 07/17/2025 By Linus Xiong
+# Updated at 07/23/2025 By Linus Xiong - add pagination for the collections index
 # Retrieves a paginated list of public collections for infinite loading
 #
 # @param page [Integer] The page number (default: 1)
@@ -35,6 +40,7 @@ def index
   }, status: :ok
 end
 
+  # Created at 07/17/2025 By Linus Xiong
   # Retrieves a specific collection by ID
   #
   # @param id [Integer] The ID of the collection to retrieve
@@ -44,6 +50,7 @@ end
     render json: @collection, status: :ok
   end
 
+  # Created at 07/17/2025 By Linus Xiong
   # Retrieves all items in a specific public collection
   #
   # @param id [Integer] The ID of the public collection
@@ -60,6 +67,7 @@ end
 
   private
 
+  # Created at 07/17/2025 By Linus Xiong
   # Finds and sets the public collection for show and items actions
   #
   # @param id [Integer] The ID of the collection to find

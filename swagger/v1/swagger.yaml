@@ -75,75 +75,6 @@ paths:
               required:
               - email
               - password
-  "/api/v1/collections":
-    get:
-      summary: list public collections
-      tags:
-      - Public Collections
-      responses:
-        '200':
-          description: collections found
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: integer
-                    title:
-                      type: string
-                    description:
-                      type: string
-                    is_public:
-                      type: boolean
-                    user_id:
-                      type: integer
-                    created_at:
-                      type: string
-                      format: datetime
-                    updated_at:
-                      type: string
-                      format: datetime
-  "/api/v1/collections/{id}":
-    parameters:
-    - name: id
-      in: path
-      description: Collection ID
-      required: true
-      schema:
-        type: integer
-    get:
-      summary: show public collection
-      tags:
-      - Public Collections
-      responses:
-        '200':
-          description: collection found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  id:
-                    type: integer
-                  title:
-                    type: string
-                  description:
-                    type: string
-                  is_public:
-                    type: boolean
-                  user_id:
-                    type: integer
-                  created_at:
-                    type: string
-                    format: datetime
-                  updated_at:
-                    type: string
-                    format: datetime
-        '404':
-          description: collection not found
   "/api/v1/providers/search":
     get:
       summary: search provider
@@ -170,6 +101,38 @@ paths:
         '200':
           description: successful
   "/api/v1/user/collections":
+    get:
+      summary: list user collections
+      tags:
+      - User Collections
+      security:
+      - Bearer: []
+      responses:
+        '200':
+          description: empty collections for new user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    user_id:
+                      type: integer
+                    title:
+                      type: string
+                    description:
+                      type: string
+                    is_public:
+                      type: boolean
+                    created_at:
+                      type: string
+                      format: datetime
+                    updated_at:
+                      type: string
+                      format: datetime
     post:
       summary: create collection
       tags:
@@ -179,7 +142,7 @@ paths:
       parameters: []
       responses:
         '201':
-          description: collection created
+          description: collection created with public flag
           content:
             application/json:
               schema:
@@ -201,6 +164,8 @@ paths:
                   updated_at:
                     type: string
                     format: datetime
+        '422':
+          description: validation errors
       requestBody:
         content:
           application/json:
@@ -228,16 +193,15 @@ paths:
       required: true
       schema:
         type: integer
-    patch:
-      summary: update collection
+    get:
+      summary: show user collection
       tags:
       - User Collections
       security:
       - Bearer: []
-      parameters: []
       responses:
         '200':
-          description: collection updated
+          description: access to public collection
           content:
             application/json:
               schema:
@@ -261,6 +225,43 @@ paths:
                     format: datetime
         '404':
           description: collection not found
+        '401':
+          description: unauthorized access to other user collection
+    patch:
+      summary: update collection
+      tags:
+      - User Collections
+      security:
+      - Bearer: []
+      parameters: []
+      responses:
+        '200':
+          description: collection privacy updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  user_id:
+                    type: integer
+                  title:
+                    type: string
+                  description:
+                    type: string
+                  is_public:
+                    type: boolean
+                  created_at:
+                    type: string
+                    format: datetime
+                  updated_at:
+                    type: string
+                    format: datetime
+        '404':
+          description: collection not found
+        '401':
+          description: unauthorized update
       requestBody:
         content:
           application/json:
@@ -288,6 +289,8 @@ paths:
           description: collection deleted
         '404':
           description: collection not found
+        '401':
+          description: unauthorized deletion
   "/api/v1/user/collections/{id}/publish":
     parameters:
     - name: id
@@ -304,7 +307,7 @@ paths:
       - Bearer: []
       responses:
         '200':
-          description: collection published
+          description: already published collection
           content:
             application/json:
               schema:
@@ -320,8 +323,6 @@ paths:
                     type: string
                   is_public:
                     type: boolean
-                  published:
-                    type: boolean
                   created_at:
                     type: string
                     format: datetime
@@ -330,6 +331,10 @@ paths:
                     format: datetime
         '404':
           description: collection not found
+        '401':
+          description: unauthorized publish
+        '422':
+          description: validation error during publish
   "/api/v1/user/favorites":
     post:
       summary: create favorite

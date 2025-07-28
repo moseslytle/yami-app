@@ -2,6 +2,10 @@ class Collection < ApplicationRecord
   belongs_to :user
   has_many :collection_items, dependent: :destroy
   attribute :is_public, :boolean, default: false
+
+  validates :title, presence: true
+  validates :user_id, presence: true
+
   def publish!
     update!(is_public: true)
   end

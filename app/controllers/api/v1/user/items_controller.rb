@@ -3,14 +3,16 @@ class Api::V1::User::ItemsController < ApplicationController
   before_action :check_exist
   before_action :find_collection_item, except: [ :create, :index ]
 
-# Retrieves all items in a specific collection with provider details
-#
-# @return [Array<CollectionItem>] JSON array of all collection items with provider info and :ok status
+  # Created at 07/22/2025 By Linus Xiong
+  # Retrieves all items in a specific collection with provider details
+  #
+  # @return [Array<CollectionItem>] JSON array of all collection items with provider info and :ok status
 def index
   items = @collection.collection_items.includes(:provider)
   render json: items.as_json(include: { provider: { only: [ :name, :category, :rating, :image_url, :price_range, :favorites_count ] } })
 end
 
+  # Created at 07/22/2025 By Linus Xiong
   # Creates a new item in a collection with the provided parameters
   #
   # @param collection_id [Integer] The ID of the collection to add the item to
@@ -32,6 +34,7 @@ end
     render json: { error: "Duplicate record" }, status: :conflict
   end
 
+  # Created at 07/22/2025 By Linus Xiong
   # Deletes a specific item from a collection
   #
   # @param collection_id [Integer] The ID of the collection containing the item
@@ -41,6 +44,7 @@ end
     @item.destroy
   end
 
+  # Created at 07/22/2025 By Linus Xiong
   # Updates an existing collection item with the provided parameters
   #
   # @param collection_id [Integer] The ID of the collection containing the item
@@ -58,6 +62,7 @@ end
 
   private
 
+  # Created at 07/22/2025 By Linus Xiong
   # Filters and validates the required parameters for collection item operations
   #
   # @return [ActionController::Parameters] Permitted parameters containing provider_id and user_note
@@ -65,6 +70,7 @@ end
     params.permit(:provider_id, :user_note)
   end
 
+  # Created at 07/22/2025 By Linus Xiong
   # Finds and sets the collection for the current request
   # Supports both owned collections and public collections
   # Called before all actions to ensure the collection exists and is accessible
@@ -82,6 +88,7 @@ end
     end
   end
 
+  # Created at 07/22/2025 By Linus Xiong
   # Finds and sets the collection item within the collection
   # Called before update and destroy actions to ensure the item exists
   #

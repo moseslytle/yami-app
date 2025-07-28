@@ -1,9 +1,4 @@
-# SQLite. Versions 3.8.0 and up are supported.
-#   gem install sqlite3
-#
-#   Ensure the SQLite 3 gem is defined in your Gemfile
-#   gem "sqlite3"
-#
+# Edited 07/27/2025 By Linus Xiong - use sqlite3 for development and test
 default: &default
   adapter: postgresql
   encoding: unicode
@@ -11,12 +6,10 @@ default: &default
   timeout: 5000
 
 development:
-  <<: *default
-  database: rails_app_development
-  username: <%= ENV["DATABASE_USERNAME"] %>
-  password: <%= ENV["DATABASE_PASSWORD"] %>
-  host: localhost
-  port: 5432
+  adapter: sqlite3
+  database: db/demo.sqlite3
+  pool: 5
+  timeout: 5000
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
@@ -36,8 +29,8 @@ production:
     database: rails_app_development
     username: <%= ENV["DATABASE_USERNAME"] %>
     password: <%= ENV["DATABASE_PASSWORD"] %>
-    host: <%= ENV["DATABASE_HOST"] %>
-    port: <%= ENV["DATABASE_PORT"] || 5432 %>
+    host: localhost
+    port: 5432
 #  cache:
 #    <<: *default
 #    database: rails_app_development
