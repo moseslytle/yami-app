@@ -57,6 +57,7 @@ class AuthenticationMiddleware
 
   def skip_auth?(path)
     allowed_patterns = [
+      %r{^/up$},
       %r{^/api/v1/.*$},
       %r{^/api-docs(/.*)?$}
     ]
