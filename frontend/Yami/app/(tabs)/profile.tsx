@@ -4,7 +4,6 @@
 // Updated 07/27/2025 By Linus - Replace api request with apiClient to handle 401 cases and log out of login status.
 // Updated 07/27/2025 by Joshua - Fix the duplicate request for nromal and focus user request.
 import { Calendar, Heart, LogOut, MapPin, Star, User } from '@tamagui/lucide-icons';
-import Constants from 'expo-constants';
 import { Stack, useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { TouchableOpacity } from 'react-native';
@@ -26,19 +25,6 @@ import {
 import { Collection, useUserCollections } from '../../hooks/useCollections';
 import apiClient from '../../lib/axios-client';
 import { useAuthStore } from '../../store/auth-store';
-
-// API configuration
-let API_BASE_URL = __DEV__ 
-  ? 'http://localhost:3000/api/v1'
-  : 'http://localhost:3000/api/v1';
-  
-const { expoGoConfig } = Constants;
-const debuggerHost = expoGoConfig?.debuggerHost;
-
-if (debuggerHost) {
-  const ip = debuggerHost.split(':')[0];
-  API_BASE_URL = `http://${ip}:3000/api/v1`;
-}
 
 interface UserProfile {
   id: number;

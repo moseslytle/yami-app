@@ -3,8 +3,9 @@
 
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
-    # if publish to production, need to change this origins
-    origins "*"
+    origins(*ENV.fetch("CORS_ORIGINS", "http://localhost:8081,http://localhost:19006")
+      .split(",")
+      .map(&:strip))
 
     resource "*",
       headers: :any,

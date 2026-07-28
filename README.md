@@ -1,5 +1,47 @@
 # Project-6-Ruby-No-Fails
 
+# Live deployment
+
+The repository is configured as a Render Blueprint. It deploys the Expo web
+frontend and Rails API together as one web service, plus a managed PostgreSQL
+database.
+
+1. Push this repository to GitHub.
+2. In Render, choose **New > Blueprint** and connect the repository.
+3. Render will read `render.yaml`, create the web service and database, run the
+   migrations, and load a small starter dataset.
+4. `GOOGLE_PLACES_API_KEY` and `YELP_API_KEY` are optional. Leave them blank for
+   the seeded portfolio demo, or add them in Render to enable live provider
+   imports.
+
+Demo login:
+
+```text
+Email: demo@yami.app
+Password: DemoYami123!
+```
+
+The health endpoint is `/up` and the interactive API documentation is at
+`/api-docs`.
+
+## Production configuration
+
+The Blueprint supplies `DATABASE_URL`, `SECRET_KEY_BASE`, and `APP_HOST`.
+Optional integrations can use:
+
+```dotenv
+GOOGLE_PLACES_API_KEY=
+YELP_API_KEY=
+SMTP_ADDRESS=
+SMTP_PORT=587
+SMTP_DOMAIN=
+SMTP_USERNAME=
+SMTP_PASSWORD=
+```
+
+For a separately hosted Expo build, set `EXPO_PUBLIC_API_URL` to the public
+Rails origin before running `npx expo export --platform web`.
+
 # Demo Video
 https://github.com/user-attachments/assets/2a4e0553-0f73-4b11-8019-5eb1ba952095
 
@@ -11,7 +53,7 @@ cd frontend/Yami
 npm install # or bun install
 npx expo start --clear
 ```
-Account: a@p-p.men, Password: a@p-p.men
+Demo account: `demo@yami.app` / `DemoYami123!`
 
 Scan the QR code above with Expo Go (Android) or the Expo Go (iOS), or press i open ios simulator or w open a website
 
@@ -1628,4 +1670,3 @@ For each team member, state the specific contributions TO THE FINAL SUBMISSION. 
 **Moses Lytle:** Implemented complete authentication system including user registration with email verification, secure login/logout with JWT tokens, OTP email verification system, password reset functionality, TOTP 2FA support, React Native frontend authentication screens with custom advanced animated Yami logo component, comprehensive security measures with rate limiting and token expiration, email delivery system, and full authentication API with RESTful endpoints.
 
 **Linus:** I implemented the backend design for the collection and collection item models, database design, and developed APIs for collections and collection items at both the user level and public level. I also added a global validation middleware for Ruby, achieving single-point control for global authentication, which reduced a lot of repetitive code defined in functions. On the frontend, I defined a global tab bar and completed a series of functions such as displaying, modifying, and deleting collections and collection items. Additionally, I packaged a unified state management and request API interceptor for my teammates.
-

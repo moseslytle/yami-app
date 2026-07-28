@@ -26,11 +26,7 @@ test:
 production:
   primary:
     <<: *default
-    database: rails_app_development
-    username: <%= ENV["DATABASE_USERNAME"] %>
-    password: <%= ENV["DATABASE_PASSWORD"] %>
-    host: localhost
-    port: 5432
+    url: <%= ENV["DATABASE_URL"] %>
 #  cache:
 #    <<: *default
 #    database: rails_app_development

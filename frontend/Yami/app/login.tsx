@@ -3,27 +3,14 @@
 // updated 7/22/2025 By Linus Xiong - Refactored to use useAuthStore instead of authService
 
 import { Eye, EyeOff } from '@tamagui/lucide-icons';
-import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, useColorScheme, View } from 'react-native';
 import { Button, H2, Input, Paragraph, XStack, YStack } from 'tamagui';
 import { AdvancedYamiLogo } from '../components/AdvancedYamiLogo';
 import { FloatingBackButton } from '../components/FloatingBackButton';
+import { API_BASE_URL } from '../lib/api-config';
 import { useAuthStore } from '../store/auth-store';
-
-// API configuration
-let API_BASE_URL = __DEV__ 
-  ? 'http://localhost:3000/api/v1'
-  : 'http://localhost:3000/api/v1';
-  
-const { expoGoConfig } = Constants;
-const debuggerHost = expoGoConfig?.debuggerHost;
-
-if (debuggerHost) {
-  const ip = debuggerHost.split(':')[0];
-  API_BASE_URL = `http://${ip}:3000/api/v1`;
-}
 
 export interface LoginCredentials {
   email: string;

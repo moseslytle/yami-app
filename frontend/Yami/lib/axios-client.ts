@@ -1,31 +1,11 @@
 // Created 07/20/2025 by Linus Xiong
 // Updated 07/27/2025 by Joshua Zhang - Change the axios interceptor to less aggressive to prevent unintentionally logout for 401.
 import axios from 'axios';
-import Constants from 'expo-constants';
-import { Platform } from 'react-native';
 import { useAuthStore } from '../store/auth-store';
-
-const getBaseURL = () => {
-  if (__DEV__) {
-    if (Platform.OS === 'web') {
-      return 'http://127.0.0.1:3000';
-    } else {
-      const { expoGoConfig } = Constants;
-      const debuggerHost = expoGoConfig?.debuggerHost;
-      
-      if (debuggerHost) {
-        const ip = debuggerHost.split(':')[0];
-        return `http://${ip}:3000`;
-      }
-      
-      return 'http://192.168.1.100:3000';
-    }
-  }
-  return 'http://127.0.0.1:3000';
-};
+import { API_ORIGIN } from './api-config';
 
 const apiClient = axios.create({
-  baseURL: getBaseURL(),
+  baseURL: API_ORIGIN,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',

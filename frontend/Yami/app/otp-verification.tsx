@@ -1,25 +1,12 @@
 // created 7/22/2025 by Moses Lytle
 // updated 7/22/2025 by Moses Lytle - Created otp verification screen to support user flow and add logo
 
-import Constants from 'expo-constants';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import { Alert, TextInput, useColorScheme, View } from 'react-native';
 import { Button, H2, Input, Paragraph, XStack, YStack } from 'tamagui';
 import { FloatingBackButton } from '../components/FloatingBackButton';
-
-// API configuration
-let API_BASE_URL = __DEV__ 
-  ? 'http://localhost:3000/api/v1'
-  : 'http://localhost:3000/api/v1';
-  
-const { expoGoConfig } = Constants;
-const debuggerHost = expoGoConfig?.debuggerHost;
-
-if (debuggerHost) {
-  const ip = debuggerHost.split(':')[0];
-  API_BASE_URL = `http://${ip}:3000/api/v1`;
-}
+import { API_BASE_URL } from '../lib/api-config';
 
 export default function OTPVerificationScreen() {
     const router = useRouter();

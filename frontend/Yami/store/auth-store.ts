@@ -3,21 +3,8 @@
 // Updated 07/27/2025 by Joshua Zhang - Refactor for the response parsing.
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Constants from 'expo-constants';
 import { create } from 'zustand';
-
-// API configuration
-let API_BASE_URL = __DEV__ 
-  ? 'http://localhost:3000/api/v1'
-  : 'http://localhost:3000/api/v1';
-
-const { expoGoConfig } = Constants;
-const debuggerHost = expoGoConfig?.debuggerHost;
-
-if (debuggerHost) {
-  const ip = debuggerHost.split(':')[0];
-  API_BASE_URL = `http://${ip}:3000/api/v1`;
-}
+import { API_BASE_URL } from '../lib/api-config';
 
 export interface User {
   id: number;

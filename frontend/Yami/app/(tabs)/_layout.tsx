@@ -86,7 +86,7 @@ function CustomTabBar({ state, descriptors, navigation }: CustomTabBarProps) {
 							}
 						};
 
-						const iconMap = {
+						const iconMap: Record<string, typeof Home> = {
 							index: Home,
 							collections: Heart,
 							login: LogIn,

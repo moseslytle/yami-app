@@ -3,7 +3,6 @@
 // Updated 07/27/2025 by Joshua - Fix the provider hours error when it's null.
 // Updated 07/27/2025 By Linus - Add add to collection button
 import { Clock, Heart, MapPin, Phone, Plus, Star } from '@tamagui/lucide-icons';
-import Constants from 'expo-constants';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Alert, Linking, Platform } from 'react-native';
@@ -23,20 +22,8 @@ import {
 } from 'tamagui';
 import { AddToCollectionModal } from '../../components/AddToCollectionModal';
 import { FloatingBackButton } from '../../components/FloatingBackButton';
+import { API_BASE_URL } from '../../lib/api-config';
 import { useAuthStore } from '../../store/auth-store';
-
-// API configuration
-let API_BASE_URL = __DEV__ 
-  ? 'http://localhost:3000/api/v1'
-  : 'http://localhost:3000/api/v1';
-  
-const { expoGoConfig } = Constants;
-const debuggerHost = expoGoConfig?.debuggerHost;
-
-if (debuggerHost) {
-  const ip = debuggerHost.split(':')[0];
-  API_BASE_URL = `http://${ip}:3000/api/v1`;
-}
 
 interface Provider {
   id: number;

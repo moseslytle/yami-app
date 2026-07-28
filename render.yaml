@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: yami-service-finder
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /up
+    initialDeployHook: ./bin/rails db:seed
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: yami-db
+          property: connectionString
+      - key: SECRET_KEY_BASE
+        generateValue: true
+      - key: APP_HOST
+        fromService:
+          type: web
+          name: yami-service-finder
+          property: host
+      - key: GOOGLE_PLACES_API_KEY
+        sync: false
+      - key: YELP_API_KEY
+        sync: false
+
+databases:
+  - name: yami-db
+    plan: free
+    databaseName: yami
+    user: yami
