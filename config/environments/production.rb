@@ -54,8 +54,11 @@ Rails.application.configure do
   # config.action_mailer.raise_delivery_errors = false
 
   # Set host to be used by links generated in mailer templates.
+  app_host = ENV["APP_HOST"].presence ||
+             ENV["RENDER_EXTERNAL_HOSTNAME"].presence ||
+             "localhost"
   config.action_mailer.default_url_options = {
-    host: ENV.fetch("APP_HOST"),
+    host: app_host,
     protocol: "https"
   }
   if ENV["SMTP_ADDRESS"].present?
@@ -63,7 +66,7 @@ Rails.application.configure do
     config.action_mailer.smtp_settings = {
       address: ENV["SMTP_ADDRESS"],
       port: ENV.fetch("SMTP_PORT", 587).to_i,
-      domain: ENV.fetch("SMTP_DOMAIN", ENV["APP_HOST"]),
+      domain: ENV.fetch("SMTP_DOMAIN", app_host),
       user_name: ENV["SMTP_USERNAME"],
       password: ENV["SMTP_PASSWORD"],
       authentication: ENV.fetch("SMTP_AUTH", "plain"),

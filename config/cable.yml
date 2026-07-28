@@ -9,9 +9,7 @@ test:
   adapter: test
 
 production:
-  adapter: solid_cable
-  connects_to:
-    database:
-      writing: cable
-  polling_interval: 0.1.seconds
-  message_retention: 1.day
+  # This deployment runs a single web process and does not configure a
+  # separate Solid Cable database. The async adapter avoids requiring an
+  # unused `production.cable` database connection during eager loading.
+  adapter: async
